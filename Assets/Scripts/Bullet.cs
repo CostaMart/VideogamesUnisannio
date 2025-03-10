@@ -26,24 +26,24 @@ public class Bullet : MonoBehaviour
                 resetItem();
             }
         }
+    }
 
-        // Update is called once per frame
-        // quando avviene una collisione il proiettile torna al luogo di origine, disattivando la fisica in modo tale da non dare fastidio.
-        void OnCollisionEnter(Collision collision)
-        {
-            resetItem();
-        }
+    // Update is called once per frame
+    // quando avviene una collisione il proiettile torna al luogo di origine, disattivando la fisica in modo tale da non dare fastidio.
+    void OnCollisionEnter(Collision collision)
+    {
+        resetItem();
+    }
 
-        void resetItem()
-        {
-            Debug.Log("Resetting bullet");
-            c.enabled = false;
-            rb.isKinematic = true;
-            c.providesContacts = false;
-            rb.linearVelocity = Vector3.zero; // Azzeriamo la velocità lineare
-            rb.angularVelocity = Vector3.zero; // Azzeriamo la velocità angolare
-            rb.Sleep(); // Disattiviamo il rigidbody
-            transform.position = initialPos; // Riportiamo il proiettile alla posizione iniziale
-        }
+    void resetItem()
+    {
+        Debug.Log("Resetting bullet");
+        c.enabled = false;
+        rb.isKinematic = true;
+        c.providesContacts = false;
+        rb.linearVelocity = Vector3.zero; // Azzeriamo la velocità lineare
+        rb.angularVelocity = Vector3.zero; // Azzeriamo la velocità angolare
+        rb.Sleep(); // Disattiviamo il rigidbody
+        transform.position = initialPos; // Riportiamo il proiettile alla posizione iniziale
     }
 }

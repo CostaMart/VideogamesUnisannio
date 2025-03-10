@@ -22,9 +22,9 @@ public class FireWeapon : MonoBehaviour
 
             GameObject b = Instantiate(bulletPrefab);
             Collider c = b.GetComponent<Collider>();
-            c.providesContacts = false;
             Rigidbody r = b.GetComponent<Rigidbody>();
             bulletPool.Enqueue((b, r, c));
+            c.providesContacts = false;
             c.enabled = false;
             r.isKinematic = true;
             b.transform.position = bulletPrefab.transform.position;
@@ -44,8 +44,8 @@ public class FireWeapon : MonoBehaviour
     {
         if (bulletPool.Count == 0) return;
         (GameObject bulletPrefab, Rigidbody rb, Collider c) = bulletPool.Dequeue();
-        c.enabled = true;
         rb.isKinematic = false;
+        c.enabled = true;
         c.providesContacts = true;
         bulletPrefab.transform.position = transform.position;
         Vector3 direction = transform.forward;

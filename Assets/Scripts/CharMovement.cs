@@ -33,7 +33,6 @@ public class CharMovement : MonoBehaviour
     void Update()
     {
         Move();
-        Aim();
     }
 
     private void Move()
@@ -52,10 +51,14 @@ public class CharMovement : MonoBehaviour
         // Se c'è movimento, normalizza la direzione e aggiorna la posizione
         if (direction != Vector3.zero)
         {
-            _animator.SetBool("walking", true);
 
-            // Se non stiamo mirando, il personaggio ruota verso la direzione di movimento
-            if (!_animator.GetBool("aiming"))
+            // Se non stiamo in combat mode, il personaggio ruota verso la direzione di movimento
+            if (Input.GetKey(KeyCode.Mouse1))
+            {
+                Vector3 q = camera.transform.forward;
+                transform.forward = Vector3.Lerp(transform.forward, q, aimingRotation * Time.deltaTime);
+            }
+            else
             {
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, usedRotationSp);
@@ -64,29 +67,8 @@ public class CharMovement : MonoBehaviour
             // Muove il personaggio nella direzione calcolata
             transform.position += direction.normalized * moveSpeed * Time.deltaTime;
         }
-        else
-        {
-            _animator.SetBool("walking", false);
-        }
     }
 
-    private void Aim()
-    {
-        if (Input.GetKeyDown(KeyCode.Mouse1))
-        {
-            _animator.SetBool("aiming", true);
-        }
-        if (Input.GetKeyUp(KeyCode.Mouse1))
-        {
-            _animator.SetBool("aiming", false);
-        }
-        // se stai mirando gira il personaggio nella direzione della videocamera
-        if (_animator.GetBool("aiming"))
-        {
-            Vector3 q = camera.transform.forward;
-            transform.forward = Vector3.Lerp(transform.forward, q, aimingRotation * Time.deltaTime);
-        }
 
-    }
 
 }
