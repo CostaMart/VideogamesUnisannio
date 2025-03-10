@@ -11,23 +11,30 @@ public class FireWeapon : MonoBehaviour
     private Queue<(GameObject, Rigidbody, Collider)> bulletPool = new Queue<(GameObject, Rigidbody, Collider)>();
 
     private Queue<(GameObject, Rigidbody, Collider)> used = new Queue<(GameObject, Rigidbody, Collider)>();
+    private Queue<Queue<(GameObject, Rigidbody, Collider)>> mags = new Queue<Queue<(GameObject, Rigidbody, Collider)>>();
 
+    public int magCount;
     public int magSize;
 
     // prepara una bolletpool di dimensione magSize
     void Start()
     {
-        for (int i = 0; i < magSize; i++)
+        for (int j = 0; j < magCount; j++)
         {
+            Queue<(GameObject, Rigidbody, Collider)> mag = new Queue<(GameObject, Rigidbody, Collider)>();
 
-            GameObject b = Instantiate(bulletPrefab);
-            Collider c = b.GetComponent<Collider>();
-            Rigidbody r = b.GetComponent<Rigidbody>();
-            bulletPool.Enqueue((b, r, c));
-            c.providesContacts = false;
-            c.enabled = false;
-            r.isKinematic = true;
-            b.transform.position = bulletPrefab.transform.position;
+            for (int i = 0; i < magSize; i++)
+            {
+                GameObject b = Instantiate(bulletPrefab);
+                Collider c = b.GetComponent<Collider>();
+                Rigidbody r = b.GetComponent<Rigidbody>();
+                mag.Enqueue((b, r, c));
+                c.providesContacts = false;
+                c.enabled = false;
+                r.isKinematic = true;
+                b.transform.position = bulletPrefab.transform.position;
+            }
+            mags.Enqueue(mag);
         }
     }
 
@@ -39,9 +46,16 @@ public class FireWeapon : MonoBehaviour
         {
             Shoot();
         }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Debug.Log("Reload");
+            Reoload();
+        }
     }
+
     void Shoot()
     {
+        Debug.Log("bullets left: " + bulletPool.Count);
         if (bulletPool.Count == 0) return;
         (GameObject bulletPrefab, Rigidbody rb, Collider c) = bulletPool.Dequeue();
         rb.isKinematic = false;
@@ -52,5 +66,11 @@ public class FireWeapon : MonoBehaviour
         direction = direction.normalized;
         rb.linearVelocity = direction * 100;
         used.Enqueue((bulletPrefab, rb, c));
+    }
+
+    void Reoload()
+    {
+        if (mags.Count == 0) return;
+        bulletPool = mags.Dequeue();
     }
 }

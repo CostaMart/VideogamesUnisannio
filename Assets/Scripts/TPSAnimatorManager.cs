@@ -30,5 +30,9 @@ public class TPSAnimatorManager : MonoBehaviour
         {
             animator.SetBool("aiming", false);
         }
+        if (Input.GetKey(KeyCode.R))
+        {
+            animator.SetTrigger("reloading");
+        }
     }
 }

@@ -49,16 +49,18 @@ public class CharMovement : MonoBehaviour
         direction.y = 0;
 
         // Se c'è movimento, normalizza la direzione e aggiorna la posizione
+
+        // Se non stiamo in combat mode, il personaggio ruota verso la direzione di movimento
+        if (Input.GetKey(KeyCode.Mouse1))
+        {
+            Debug.Log("Aiming");
+            Vector3 q = camera.transform.forward;
+            transform.forward = Vector3.Lerp(transform.forward, q, aimingRotation * Time.deltaTime);
+        }
+
         if (direction != Vector3.zero)
         {
-
-            // Se non stiamo in combat mode, il personaggio ruota verso la direzione di movimento
-            if (Input.GetKey(KeyCode.Mouse1))
-            {
-                Vector3 q = camera.transform.forward;
-                transform.forward = Vector3.Lerp(transform.forward, q, aimingRotation * Time.deltaTime);
-            }
-            else
+            if (!Input.GetKey(KeyCode.Mouse1))
             {
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, usedRotationSp);
