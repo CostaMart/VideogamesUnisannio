@@ -8,12 +8,19 @@ using Unity.Cinemachine;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Quaternion = UnityEngine.Quaternion;
+using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
 public class CharMovement : MonoBehaviour
 {
+
+    public PlayerInput playerInput;
+    private InputAction aim;
+    private InputAction move;
+    private InputAction reload;
     public CinemachineCamera camera;
     private bool aiming = false;
     private bool lastWas = false;
@@ -30,14 +37,16 @@ public class CharMovement : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        // input system setup
+        move = playerInput.actions["Move"];
+        aim = playerInput.actions["Aim"];
+        reload = playerInput.actions["Reload"];
+        aim.performed += ctx => { aiming = true; };
+        aim.canceled += ctx => { aiming = false; };
+
         Application.targetFrameRate = 60;
         usedRotationSp = rotationSpeed;
         aimingRotation = rotationSpeed + 10;
-    }
-
-    void OnAnimatorIK(int layerIndex)
-    {
-        Debug.Log("executed");
     }
 
     void Update()
@@ -48,30 +57,18 @@ public class CharMovement : MonoBehaviour
 
     private void Move()
     {
-        // controlliamo eventuale stato di mira
-        if (Input.GetKeyDown(KeyCode.Mouse1))
-        {
-            aiming = true;
-        }
 
-        if (Input.GetKeyUp(KeyCode.Mouse1))
-        {
-            aiming = false;
-        }
-
+        Vector2 directionInput = move.ReadValue<Vector2>();
         Vector3 direction = Vector3.zero;
 
         // Determina la direzione del movimento rispetto alla telecamera
-        if (Input.GetKey(KeyCode.W)) direction += camera.transform.forward;
-        if (Input.GetKey(KeyCode.S)) direction -= camera.transform.forward;
-        if (Input.GetKey(KeyCode.D)) direction += camera.transform.right;
-        if (Input.GetKey(KeyCode.A)) direction -= camera.transform.right;
+        direction += camera.transform.forward * directionInput.y;
+        direction += camera.transform.right * directionInput.x;
 
         // Annulla la componente verticale per evitare movimenti indesiderati
         direction.y = 0;
 
 
-        //1*\ qui cambiamo il punto verso cui il personaggio si rivolge, quando miriamo lo facciamo girare leggermente più a destra per un effetto migliore
         if (aiming)
         {
             // rotazione basata sulla direzione della telecamera, se stiamo mirando
@@ -82,7 +79,6 @@ public class CharMovement : MonoBehaviour
 
         if (direction != Vector3.zero)
         {
-            // questo è il duale del commento 1*, se non stiamo mirando vogliamo il personaggio rivolto in avanti 
             if (!aiming)
             {
                 // rotazione basata sulla direzione di movimento, se non si mira

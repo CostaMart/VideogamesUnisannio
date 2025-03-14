@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.InputSystem;
 
 public class TPSAnimatorManager : MonoBehaviour
 {
@@ -33,47 +34,59 @@ public class TPSAnimatorManager : MonoBehaviour
     private bool aiming = false;
     private bool lastWas = false;
 
+    // actions
+    public PlayerInput playerInput;
+
+    private InputAction aim;
+    private InputAction move;
+    private InputAction reload;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        animator = GetComponent<Animator>();
+        // input system setup
+        move = playerInput.actions["Move"];
+        aim = playerInput.actions["Aim"];
+        reload = playerInput.actions["Reload"];
+        playerInput.actions["Aim"].performed += ctx => { aiming = true; animator.SetBool("aiming", aiming); };
+        playerInput.actions["Aim"].canceled += ctx => { aiming = false; animator.SetBool("aiming", aiming); };
+        move.performed += ctx => { animator.SetBool("walking", true); };
+        move.canceled += ctx => { animator.SetBool("walking", false); };
+        reload.performed += ctx => { animator.SetTrigger("reloading"); };
 
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
-        {
-            animator.SetBool("walking", true);
-        }
-        else
-        {
-            animator.SetBool("walking", false);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Mouse1))
-        {
-            animator.SetBool("aiming", true);
-            aiming = true;
-        }
-        if (Input.GetKeyUp(KeyCode.Mouse1))
-        {
-            animator.SetBool("aiming", false);
-            aiming = false;
-        }
-        if (Input.GetKey(KeyCode.R))
-        {
-            animator.SetTrigger("reloading");
-        }
 
         // se  stiamo mirando spostiamo l'arma nella posizione di mira, si controlla lastwas per non farlo ripetutamente
-        if (aiming && !lastWas)
+        if (aiming)
         {
-            lastWas = true;
-            weapon.transform.SetParent(aimingWeaponStand);
-            weapon.transform.localPosition = Vector3.zero;
-            weapon.transform.localRotation = Quaternion.identity;
+            if (!lastWas)
+            {
+                lastWas = true;
+                weapon.transform.SetParent(aimingWeaponStand);
+                weapon.transform.localPosition = Vector3.zero;
+                weapon.transform.localRotation = Quaternion.identity;
+
+                //1* qui cambiamo il punto verso cui il personaggio si rivolge, quando miriamo lo facciamo girare leggermente più a destra per un effetto migliore
+                var newSourceObject = aimConstraint.data.sourceObjects;
+                newSourceObject.SetWeight(0, 0);
+                newSourceObject.SetWeight(1, 1);
+
+                var newConstraintData = aimConstraint.data;
+                newConstraintData.offset = new Vector3(-27.3f, 0, 0);
+                aimConstraint.data = newConstraintData;
+                aimConstraint.data.sourceObjects = newSourceObject;
+                twoBoneIKConstraint.weight = 1;
+                rb.Build();
+            }
+
+            // qui spostiamo la mano sinistra nella posizione corretta per afferrare l'arma, questa è l'unica cosa che è necessario fare sempre ad ogni frame
+            IKLeftHand.position = wpnFrontHandle.position;
+            IKLeftHand.rotation = wpnFrontHandle.rotation;
         }
 
         // se non stiamo mirando spostiamo l'arma nella posizione di riposo, si controlla lastwas per non farlo ripetutamente
@@ -83,45 +96,21 @@ public class TPSAnimatorManager : MonoBehaviour
             weapon.transform.SetParent(relaxedWeaponStand);
             weapon.transform.localPosition = Vector3.zero;
             weapon.transform.localRotation = Quaternion.identity;
-        }
 
-        if (aiming)
-        {
-
-            if (aimConstraint.data.sourceObjects.GetWeight(0) != 0)
-            {
-                var newSourceObject = aimConstraint.data.sourceObjects;
-                newSourceObject.SetWeight(0, 0);
-                newSourceObject.SetWeight(1, 1);
-                var newConstraintData = aimConstraint.data;
-                newConstraintData.offset = new Vector3(-27.3f, 0, 0);
-                aimConstraint.data = newConstraintData;
-                aimConstraint.data.sourceObjects = newSourceObject;
-                rb.Build();
-            }
-
-
-            twoBoneIKConstraint.weight = 1;
-            IKLeftHand.position = wpnFrontHandle.position;
-            IKLeftHand.rotation = wpnFrontHandle.rotation;
-
-        }
-        if (!aiming)
-        {
-            if (aimConstraint.data.sourceObjects.GetWeight(0) != 1)
-            {
-                var newSourceObject = aimConstraint.data.sourceObjects;
-                newSourceObject.SetWeight(0, 1);
-                newSourceObject.SetWeight(1, 0);
-                aimConstraint.data.sourceObjects = newSourceObject;
-                var newConstrintData = aimConstraint.data;
-                newConstrintData.offset = Vector3.zero;
-                aimConstraint.data = newConstrintData;
-                rb.Build();
-            }
-
+            // questo è il duale del commento 1*, se non stiamo mirando vogliamo il personaggio rivolto in avanti 
+            var newSourceObject = aimConstraint.data.sourceObjects;
+            newSourceObject.SetWeight(0, 1);
+            newSourceObject.SetWeight(1, 0);
+            aimConstraint.data.sourceObjects = newSourceObject;
+            var newConstrintData = aimConstraint.data;
+            newConstrintData.offset = Vector3.zero;
+            aimConstraint.data = newConstrintData;
             twoBoneIKConstraint.weight = 0;
+            rb.Build();
+
         }
+
 
     }
+
 }
