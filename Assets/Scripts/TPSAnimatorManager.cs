@@ -11,8 +11,11 @@ public class TPSAnimatorManager : MonoBehaviour
     [Tooltip("in order to activate IK functinoalities, it is required to apply a constraint ad pass it to this cript. This is the constraint that will move the character upper body part")]
     public MultiAimConstraint aimConstraint;
 
+    [Tooltip("constraing applied to weapon to rotate it thowrds the aim direction")]
+    public MultiRotationConstraint weaponDirectionConstraint;
+
     [Tooltip("this constraint is required to move the character left hand in order to grab the weapon")]
-    public TwoBoneIKConstraint twoBoneIKConstraint;
+    public TwoBoneIKConstraint twoBoneIKConstraintL;
 
     [Tooltip("represents the postion of the weapon when the character is not aiming")]
     public Transform relaxedWeaponStand;
@@ -24,6 +27,12 @@ public class TPSAnimatorManager : MonoBehaviour
 
     [Tooltip("reference to the transform representing where the left hand should be placed on the weapon when the character is aiming")]
     public Transform wpnFrontHandle;
+
+    [Tooltip("reference to the transform representing where the left hand should be placed on the weapon when the character is not aiming")]
+    public Transform wpnBackHandle;
+
+    [Tooltip("reference to the right hand Ik target transform")]
+    public Transform IKRightHand;
 
     [Tooltip("reference to the left hand Ik target transform")]
     public Transform IKLeftHand;
@@ -37,24 +46,48 @@ public class TPSAnimatorManager : MonoBehaviour
     // actions
     public PlayerInput playerInput;
 
+    private InputAction jump;
+
     private InputAction aim;
     private InputAction move;
     private InputAction reload;
+    public bool toggleAim = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         // input system setup
         move = playerInput.actions["Move"];
+        jump = playerInput.actions["Jump"];
         aim = playerInput.actions["Aim"];
         reload = playerInput.actions["Reload"];
-        playerInput.actions["Aim"].performed += ctx => { aiming = true; animator.SetBool("aiming", aiming); };
-        playerInput.actions["Aim"].canceled += ctx => { aiming = false; animator.SetBool("aiming", aiming); };
+
+        if (!toggleAim)
+        {
+            playerInput.actions["Aim"].performed += ctx => { aiming = true; animator.SetBool("aiming", aiming); };
+            playerInput.actions["Aim"].canceled += ctx => { aiming = false; animator.SetBool("aiming", aiming); };
+        }
+        else
+        {
+            playerInput.actions["Aim"].performed += ctx => { aiming = !aiming; animator.SetBool("aiming", aiming); };
+        }
+
+        jump.performed += ctx => { animator.SetBool("jump", true); };
         move.performed += ctx => { animator.SetBool("walking", true); };
         move.canceled += ctx => { animator.SetBool("walking", false); };
         reload.performed += ctx => { animator.SetTrigger("reloading"); };
 
         animator = GetComponent<Animator>();
+    }
+
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("terrain"))
+        {
+            Debug.Log("collision");
+            animator.SetBool("jump", false);
+        }
     }
 
     // Update is called once per frame
@@ -80,7 +113,8 @@ public class TPSAnimatorManager : MonoBehaviour
                 newConstraintData.offset = new Vector3(-27.3f, 0, 0);
                 aimConstraint.data = newConstraintData;
                 aimConstraint.data.sourceObjects = newSourceObject;
-                twoBoneIKConstraint.weight = 1;
+                twoBoneIKConstraintL.weight = 1;
+                weaponDirectionConstraint.weight = 1;
                 rb.Build();
             }
 
@@ -105,7 +139,8 @@ public class TPSAnimatorManager : MonoBehaviour
             var newConstrintData = aimConstraint.data;
             newConstrintData.offset = Vector3.zero;
             aimConstraint.data = newConstrintData;
-            twoBoneIKConstraint.weight = 0;
+            twoBoneIKConstraintL.weight = 0;
+            weaponDirectionConstraint.weight = 0;
             rb.Build();
 
         }

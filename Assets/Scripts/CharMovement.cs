@@ -17,14 +17,22 @@ using Vector3 = UnityEngine.Vector3;
 public class CharMovement : MonoBehaviour
 {
 
+    // input actions
     public PlayerInput playerInput;
     private InputAction aim;
     private InputAction move;
     private InputAction reload;
+    private InputAction jump;
+    // ------------------------------------
     public CinemachineCamera camera;
+    public float JumpSpeed = 5f;
+    public int maxJumps = 1;
+    private int jumpsAvailable = 1;
     private bool aiming = false;
     private bool lastWas = false;
     public float moveSpeed = 5f;
+
+    private Rigidbody rb;
 
 
 
@@ -37,12 +45,17 @@ public class CharMovement : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        jumpsAvailable = maxJumps;
+        rb = GetComponent<Rigidbody>();
         // input system setup
         move = playerInput.actions["Move"];
         aim = playerInput.actions["Aim"];
         reload = playerInput.actions["Reload"];
+        jump = playerInput.actions["Jump"];
         aim.performed += ctx => { aiming = true; };
         aim.canceled += ctx => { aiming = false; };
+        jump.performed += ctx => { Jump(); };
+
 
         Application.targetFrameRate = 60;
         usedRotationSp = rotationSpeed;
@@ -52,7 +65,6 @@ public class CharMovement : MonoBehaviour
     void Update()
     {
         Move();
-        CheckActions();
     }
 
     private void Move()
@@ -90,14 +102,18 @@ public class CharMovement : MonoBehaviour
         }
     }
 
-    void CheckActions()
+
+    void OnCollisionEnter(Collision collision)
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            // fare salto
-        }
+        collision.gameObject.CompareTag("terrain");
+        jumpsAvailable = maxJumps;
     }
 
-
+    void Jump()
+    {
+        if (jumpsAvailable <= 0) return;
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, JumpSpeed, rb.linearVelocity.z);
+        jumpsAvailable--;
+    }
 
 }
