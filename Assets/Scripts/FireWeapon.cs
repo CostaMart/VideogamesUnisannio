@@ -33,8 +33,6 @@ public class FireWeapon : MonoBehaviour
     void Start()
     {
         // setup input actions
-        fireAction = playerInput.actions["Attack"];
-        fireAction.performed += ctx => { Shoot(); };
         reloadAction = playerInput.actions["Reload"];
         reloadAction.performed += ctx => { Reoload(); };
 
@@ -61,8 +59,9 @@ public class FireWeapon : MonoBehaviour
         }
     }
 
-    void Shoot()
+    public void Shoot()
     {
+        Debug.Log("Shoot");
         // can't shoot while reloading
         if (animatorSet && anim.GetCurrentAnimatorStateInfo(1).IsName("Reload")) return;
 

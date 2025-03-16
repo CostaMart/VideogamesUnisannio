@@ -14,6 +14,7 @@ using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
+
 public class CharMovement : MonoBehaviour
 {
 
@@ -24,6 +25,7 @@ public class CharMovement : MonoBehaviour
     private InputAction reload;
     private InputAction jump;
     // ------------------------------------
+    private Animator anim;
     public CinemachineCamera camera;
     public float JumpSpeed = 5f;
     public int maxJumps = 1;
@@ -31,6 +33,8 @@ public class CharMovement : MonoBehaviour
     private bool aiming = false;
     private bool lastWas = false;
     public float moveSpeed = 5f;
+
+    public float speedLimitBeforeRagdolling = 10f;
 
     private Rigidbody rb;
 
@@ -45,6 +49,7 @@ public class CharMovement : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        anim = GetComponent<Animator>();
         jumpsAvailable = maxJumps;
         rb = GetComponent<Rigidbody>();
         // input system setup
@@ -72,6 +77,13 @@ public class CharMovement : MonoBehaviour
 
         Vector2 directionInput = move.ReadValue<Vector2>();
         Vector3 direction = Vector3.zero;
+
+        Debug.Log("this is velocity: " + rb.linearVelocity);
+        if (Math.Abs(rb.linearVelocity.y) > speedLimitBeforeRagdolling || Math.Abs(rb.linearVelocity.x) > speedLimitBeforeRagdolling || Math.Abs(rb.linearVelocity.z) > speedLimitBeforeRagdolling)
+        {
+            anim.enabled = false;
+        }
+
 
         // Determina la direzione del movimento rispetto alla telecamera
         direction += camera.transform.forward * directionInput.y;
@@ -105,8 +117,8 @@ public class CharMovement : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        collision.gameObject.CompareTag("terrain");
-        jumpsAvailable = maxJumps;
+        if (collision.gameObject.CompareTag("terrain"))
+            jumpsAvailable = maxJumps;
     }
 
     void Jump()
@@ -115,5 +127,7 @@ public class CharMovement : MonoBehaviour
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, JumpSpeed, rb.linearVelocity.z);
         jumpsAvailable--;
     }
+
+
 
 }

@@ -50,6 +50,7 @@ public class TPSAnimatorManager : MonoBehaviour
 
     private InputAction aim;
     private InputAction move;
+    private InputAction throwAction;
     private InputAction reload;
     public bool toggleAim = false;
 
@@ -61,6 +62,9 @@ public class TPSAnimatorManager : MonoBehaviour
         jump = playerInput.actions["Jump"];
         aim = playerInput.actions["Aim"];
         reload = playerInput.actions["Reload"];
+        throwAction = playerInput.actions["Throw"];
+
+        throwAction.performed += ctx => { Debug.Log("throwing"); animator.SetTrigger("throw"); };
 
         if (!toggleAim)
         {

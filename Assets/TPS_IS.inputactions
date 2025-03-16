@@ -103,6 +103,42 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Wpn1",
+                    "type": "Button",
+                    "id": "99d74340-51b2-4d37-9f61-89c0d1d29235",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Wpn2",
+                    "type": "Button",
+                    "id": "2d6e8cb6-5d6e-4f6a-85c9-6a6c1e68856d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Throwable",
+                    "type": "Button",
+                    "id": "38188d35-cf89-4465-8110-d999ac2ae63a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Throw",
+                    "type": "Button",
+                    "id": "18bcdb8c-edbd-4700-863f-93d7c3545be2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -532,6 +568,50 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "Reload",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0c8af734-84f9-4e5a-acb6-d7d9d0de061b",
+                    "path": "<Keyboard>/#(1)",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Wpn1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f76a29b1-f65d-4f7d-ae6c-2c2963d0044f",
+                    "path": "<Keyboard>/#(2)",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Wpn2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3f7b6de4-31e6-40af-b6fb-ef168d697d7f",
+                    "path": "<Keyboard>/#(3)",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Throwable",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5a3c08b2-d071-4962-b35f-c42c33a16ee1",
+                    "path": "<Keyboard>/#(G)",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Throw",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
