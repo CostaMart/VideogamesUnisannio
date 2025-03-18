@@ -6,8 +6,10 @@ using NUnit.Framework.Constraints;
 using Palmmedia.ReportGenerator.Core;
 using Unity.Cinemachine;
 using Unity.Mathematics;
+using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Quaternion = UnityEngine.Quaternion;
@@ -34,24 +36,37 @@ public class CharMovement : MonoBehaviour
     private bool lastWas = false;
     public float moveSpeed = 5f;
 
-    public float speedLimitBeforeRagdolling = 10f;
 
     private Rigidbody rb;
+    private Collider col;
 
+    // ragdolling managamenet
+    public float speedLimitBeforeRagdolling = 10f;
+    private GameObject ragdollReference;
 
+    private bool ragdolling = false;
 
     [Header("Rotation Settings")]
     public float rotationSpeed = 0.5f;
     private float usedRotationSp;
     private float aimingRotation;
 
+    // Gestione Event System
+
+    [Tooltip("Evento chiamato quando il personaggio entra in modalità ragdoll")]
+    public UnityEvent<bool, GameObject> onRagdolling;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+
+        col = GetComponent<Collider>();
         anim = GetComponent<Animator>();
         jumpsAvailable = maxJumps;
         rb = GetComponent<Rigidbody>();
+        Ragdolling(false);
+
         // input system setup
         move = playerInput.actions["Move"];
         aim = playerInput.actions["Aim"];
@@ -78,12 +93,24 @@ public class CharMovement : MonoBehaviour
         Vector2 directionInput = move.ReadValue<Vector2>();
         Vector3 direction = Vector3.zero;
 
-        Debug.Log("this is velocity: " + rb.linearVelocity);
-        if (Math.Abs(rb.linearVelocity.y) > speedLimitBeforeRagdolling || Math.Abs(rb.linearVelocity.x) > speedLimitBeforeRagdolling || Math.Abs(rb.linearVelocity.z) > speedLimitBeforeRagdolling)
+        if (!ragdolling && (Math.Abs(rb.linearVelocity.y) > speedLimitBeforeRagdolling || Math.Abs(rb.linearVelocity.x) > speedLimitBeforeRagdolling || Math.Abs(rb.linearVelocity.z) > speedLimitBeforeRagdolling))
         {
-            anim.enabled = false;
+            Ragdolling(true);
+            ragdolling = true;
         }
 
+
+        if (ragdolling)
+        {
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                Ragdolling(false);
+                ragdolling = false;
+            }
+
+            // se siamo in modalità ragdoll non possiamo muoverci
+            return;
+        }
 
         // Determina la direzione del movimento rispetto alla telecamera
         direction += camera.transform.forward * directionInput.y;
@@ -128,6 +155,50 @@ public class CharMovement : MonoBehaviour
         jumpsAvailable--;
     }
 
+    /*Activate or deactivate ragdolling*/
+    void Ragdolling(bool ragdolling)
+    {
+
+        Rigidbody[] r = GetComponentsInChildren<Rigidbody>();
+        foreach (Rigidbody otherRigid in r)
+        {
+            if (rb != otherRigid)
+            {
+                otherRigid.isKinematic = !ragdolling;
+                otherRigid.linearVelocity = rb.linearVelocity;
+                otherRigid.angularVelocity = rb.angularVelocity;
+
+                // è necessario recuperare questa reference per posizionare il
+                //  personaggio correttamente quando si ripristinerà dopo la ragdoll
+                if (ragdollReference == null && otherRigid.transform != null)
+                    ragdollReference = otherRigid.gameObject;
+            }
+
+
+            if (otherRigid == r.Last())
+            {
+                onRagdolling?.Invoke(ragdolling, otherRigid.gameObject);
+            }
+
+        }
+
+        foreach (Collider otherCollid in GetComponentsInChildren<Collider>())
+        {
+            if (otherCollid != col)
+            {
+                otherCollid.enabled = ragdolling;
+            }
+        }
+
+        if (!ragdolling)
+        {
+            transform.position = ragdollReference.transform.position;
+        }
+
+        anim.enabled = !ragdolling;
+        col.enabled = !ragdolling;
+        rb.isKinematic = ragdolling;
+    }
 
 
 }

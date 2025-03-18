@@ -11,6 +11,7 @@ public class Throwable : MonoBehaviour
     public float explosionRadius = 5;
 
     public float explosionForce = 1000;
+    public float verticalFactor = 3;
     public int countdown = 3;
     private bool exploded = false;
 
@@ -22,8 +23,6 @@ public class Throwable : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         Debug.Log("throw collided");
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
 
         if (!exploded)
         {
@@ -37,7 +36,7 @@ public class Throwable : MonoBehaviour
                     Rigidbody b = item.GetComponent<Rigidbody>();
                     if (b)
                     {
-                        b.AddExplosionForce(explosionForce, transform.position, explosionRadius);
+                        b.AddExplosionForce(explosionForce, transform.position, explosionRadius, verticalFactor, ForceMode.Impulse);
                     }
                 }
             }

@@ -37,7 +37,6 @@ public class TPSInventoryManager : MonoBehaviour
         thrw = playerInput.actions["Throw"];
         wpn1.performed += ctx => { Debug.Log("selected Primary"); currentWeapn = ChoosenWeapn.Primary; };
         wpn2.performed += ctx => { Debug.Log("selected Secondary"); currentWeapn = ChoosenWeapn.Secondary; };
-        thrw.performed += ctx => { Throw(); };
         doAction.performed += ctx => { PerformAction(); };
     }
 
