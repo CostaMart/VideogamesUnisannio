@@ -8,7 +8,7 @@ public class TPSInventoryManager : MonoBehaviour
     public UnityEvent SecondaryWeapn;
     public UnityEvent ThrowAction;
 
-    enum ChoosenWeapn
+    protected enum ChoosenWeapn
     {
         Primary,
         Secondary,

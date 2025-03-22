@@ -1,6 +1,7 @@
 using Unity.Cinemachine;
 using UnityEditor.EditorTools;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
 
 public class MouseRotateCamera : MonoBehaviour
@@ -10,7 +11,6 @@ public class MouseRotateCamera : MonoBehaviour
     private float rotationY = 0f;
     private Vector3 initialPos;
     private Vector3 zoomVector;
-    private Vector3 newPos;
 
     private InputAction aimRotation;
     private InputAction zoomAction;
@@ -19,6 +19,8 @@ public class MouseRotateCamera : MonoBehaviour
     private Vector2 delta;
 
     // ragdolling camera management
+    [Tooltip("se viene passato un riferimento al ragdoller la camera gestirà anche gli eventi di attivazione della ragdoll, iniziando a seguirla nel momento in cui viene attivata")]
+    [SerializeField] private Ragdoller ragdoller;
     private Vector3 initialLocalPos;
     private GameObject ragdollRef;
     private bool ragdolling = false;
@@ -43,10 +45,15 @@ public class MouseRotateCamera : MonoBehaviour
     [Tooltip("FOV della telecamera quando non si è in modalità mira")]
     public float defaultFov = 60f;
 
+    void Awake()
+    {
+        if (ragdoller != null)
+            ragdoller.onRagdolling += OnRagdolling;
+        initialLocalPos = transform.localPosition;
+    }
+
     void Start()
     {
-        initialLocalPos = transform.localPosition;
-        initialLocalPos.y += 1.76f;
         transform.localPosition = initialLocalPos;
         aimRotation = playerInput.actions["Look"];
         zoomAction = playerInput.actions["Aim"];
@@ -65,6 +72,7 @@ public class MouseRotateCamera : MonoBehaviour
     {
 
         delta = aimRotation.ReadValue<Vector2>();
+
         if (aiming && !zoomed)
         {
             zoomed = true;

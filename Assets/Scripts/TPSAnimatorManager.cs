@@ -4,41 +4,53 @@ using UnityEngine.InputSystem;
 
 public class TPSAnimatorManager : MonoBehaviour
 {
+    public RigBuilder rb;
+    [SerializeField] private EquipmentEventManager equipmentEventManager;
+
     // riferimetno alla posizione desiderata durante la mira
-    [Tooltip("Ik settings")]
     [Header("IK Settings")]
-    public Animator _animator;
     [Tooltip("in order to activate IK functinoalities, it is required to apply a constraint ad pass it to this cript. This is the constraint that will move the character upper body part")]
     public MultiAimConstraint aimConstraint;
 
+
+    [Header("Lef Hand Settings")]
+    [Tooltip("this constraint is required to move the character left hand in order to grab the weapon")]
+    public TwoBoneIKConstraint twoBoneIKConstraintL;
+    [Tooltip("reference to the left hand Ik target transform")]
+    public Transform IKLeftHand;
+
+
+    [Header("Right Hand Settings")]
+    [Tooltip("this constraint is required to move the character left hand in order to grab the weapon")]
+    public TwoBoneIKConstraint twoBoneIKConstraintR;
+    [Tooltip("reference to the right hand Ik target transform")]
+    public Transform IKRightHand;
+
+
+    [Header("Two handed weapon settings")]
+    public GameObject weapon;
+    [Tooltip("represents the postion of the weapon when the character is not aiming")]
+    public Transform relaxedWeaponStand;
+    [Tooltip("represents the postion of the weapon when the character is aiming")]
+    public Transform aimingWeaponStand;
+    [Tooltip("reference to the transform representing where the left hand should be placed on the weapon when the character is aiming")]
+    public Transform wpnFrontHandle;
     [Tooltip("constraing applied to weapon to rotate it thowrds the aim direction")]
     public MultiRotationConstraint weaponDirectionConstraint;
 
-    [Tooltip("this constraint is required to move the character left hand in order to grab the weapon")]
-    public TwoBoneIKConstraint twoBoneIKConstraintL;
-
-    [Tooltip("represents the postion of the weapon when the character is not aiming")]
-    public Transform relaxedWeaponStand;
-
-    [Tooltip("represents the postion of the weapon when the character is aiming")]
-    public Transform aimingWeaponStand;
-
-    public RigBuilder rb;
-
-    [Tooltip("reference to the transform representing where the left hand should be placed on the weapon when the character is aiming")]
-    public Transform wpnFrontHandle;
 
     [Tooltip("reference to the transform representing where the left hand should be placed on the weapon when the character is not aiming")]
     public Transform wpnBackHandle;
 
-    [Tooltip("reference to the right hand Ik target transform")]
-    public Transform IKRightHand;
 
-    [Tooltip("reference to the left hand Ik target transform")]
-    public Transform IKLeftHand;
+    [Header("Pistol Settings")]
+    [Tooltip("reference to the transform representing where the left hand should be placed on the pistol when the character is aiming")]
+    [SerializeField] private Transform PistleHandle;
+    [SerializeField] private Transform PistolRightHandle;
+
+
     Animator animator;
 
-    public GameObject weapon;
 
     private bool aiming = false;
     private bool lastWas = false;
@@ -55,6 +67,7 @@ public class TPSAnimatorManager : MonoBehaviour
     public bool toggleAim = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private bool pistol = false;
     void Start()
     {
         // input system setup
@@ -80,8 +93,27 @@ public class TPSAnimatorManager : MonoBehaviour
         move.performed += ctx => { animator.SetBool("walking", true); };
         move.canceled += ctx => { animator.SetBool("walking", false); };
         reload.performed += ctx => { animator.SetTrigger("reloading"); };
-
         animator = GetComponent<Animator>();
+
+
+        // equipment event manager setup
+        equipmentEventManager.AddListenerWeaponSelected((index) =>
+        {
+            if (aiming) return;
+
+            if (index == 2)
+            {
+                Debug.Log("pistol");
+                pistol = true;
+                animator.SetBool("pistol_eq", true);
+            }
+            else if (index == 1)
+            {
+                pistol = false;
+                animator.SetBool("pistol_eq", false);
+            }
+        });
+
     }
 
 
@@ -122,9 +154,23 @@ public class TPSAnimatorManager : MonoBehaviour
                 rb.Build();
             }
 
-            // qui spostiamo la mano sinistra nella posizione corretta per afferrare l'arma, questa è l'unica cosa che è necessario fare sempre ad ogni frame
-            IKLeftHand.position = wpnFrontHandle.position;
-            IKLeftHand.rotation = wpnFrontHandle.rotation;
+            // spostiamo la mano nella posizione corretta a seconda di se si impugna una pistola o un fucile
+            if (pistol)
+            {
+                twoBoneIKConstraintR.weight = 1;
+                IKRightHand.position = PistolRightHandle.position;
+                IKRightHand.rotation = PistolRightHandle.rotation;
+                IKLeftHand.position = PistleHandle.position;
+                IKLeftHand.rotation = PistleHandle.rotation;
+            }
+
+            else
+            {
+                twoBoneIKConstraintR.weight = 0;
+                IKLeftHand.position = wpnFrontHandle.position;
+                IKLeftHand.rotation = wpnFrontHandle.rotation;
+            }
+
         }
 
         // se non stiamo mirando spostiamo l'arma nella posizione di riposo, si controlla lastwas per non farlo ripetutamente
@@ -141,9 +187,11 @@ public class TPSAnimatorManager : MonoBehaviour
             newSourceObject.SetWeight(1, 0);
             aimConstraint.data.sourceObjects = newSourceObject;
             var newConstrintData = aimConstraint.data;
+
             newConstrintData.offset = Vector3.zero;
             aimConstraint.data = newConstrintData;
             twoBoneIKConstraintL.weight = 0;
+            twoBoneIKConstraintR.weight = 0;
             weaponDirectionConstraint.weight = 0;
             rb.Build();
 
