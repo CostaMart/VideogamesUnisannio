@@ -7,29 +7,20 @@ using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
 
-public class CharMovementLogic : MonoBehaviour
+public class MovementLogic : MonoBehaviour
 {
 
     private Animator anim;
     public CinemachineCamera camera;
-    public float JumpSpeed = 5f;
-    public int maxJumps = 1;
     private int jumpsAvailable = 1;
     private bool aiming = false;
-
-    public float moveSpeed = 5f;
 
 
     private Rigidbody rb;
     private Collider col;
 
-    [Header("Rotation Settings")]
-    public float rotationSpeed = 0.5f;
-    private float usedRotationSp;
-    private float aimingRotation;
-
-
     // movement event manager 
+    [SerializeField] private PlayerSettings playerSettings;
     [SerializeField] private ControlEventManager controlEventManager;
     private Vector3 moveDirection = Vector3.zero;
 
@@ -44,15 +35,13 @@ public class CharMovementLogic : MonoBehaviour
     }
     void Start()
     {
+        jumpsAvailable = playerSettings.MaxJumps;
 
         col = GetComponent<Collider>();
         anim = GetComponent<Animator>();
-        jumpsAvailable = maxJumps;
         rb = GetComponent<Rigidbody>();
 
         Application.targetFrameRate = 60;
-        usedRotationSp = rotationSpeed;
-        aimingRotation = rotationSpeed + 10;
     }
 
 
@@ -81,7 +70,7 @@ public class CharMovementLogic : MonoBehaviour
             // rotazione basata sulla direzione della telecamera, se stiamo mirando
             Vector3 q = camera.transform.forward;
             q.y = 0;
-            transform.forward = Vector3.Lerp(transform.forward, q, aimingRotation * Time.deltaTime);
+            transform.forward = Vector3.Lerp(transform.forward, q, playerSettings.AimRotationSpeed * Time.deltaTime);
         }
 
         if (direction != Vector3.zero)
@@ -90,10 +79,10 @@ public class CharMovementLogic : MonoBehaviour
             {
                 // rotazione basata sulla direzione di movimento, se non si mira
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, usedRotationSp);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, playerSettings.RotationSpeed * Time.deltaTime);
             }
 
-            transform.position += direction.normalized * moveSpeed * Time.deltaTime;
+            transform.position += direction.normalized * playerSettings.MoveSpeed * Time.deltaTime;
         }
     }
 
@@ -101,13 +90,13 @@ public class CharMovementLogic : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("terrain"))
-            jumpsAvailable = maxJumps;
+            jumpsAvailable = playerSettings.MaxJumps;
     }
 
     public void Jump()
     {
         if (jumpsAvailable <= 0) return;
-        rb.linearVelocity = new Vector3(rb.linearVelocity.x, JumpSpeed, rb.linearVelocity.z);
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, playerSettings.JumpSpeed, rb.linearVelocity.z);
         jumpsAvailable--;
     }
 

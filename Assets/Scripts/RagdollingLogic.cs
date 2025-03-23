@@ -11,8 +11,7 @@ public class Ragdoller : MonoBehaviour
     Rigidbody rb;
     Animator anim;
     GameObject ragdollReference;
-    public UnityAction<bool, GameObject> onRagdolling;
-    public float speedLimitBeforeRagdolling = 10f;
+    [SerializeField] ControlEventManager controlEventManager;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -21,14 +20,10 @@ public class Ragdoller : MonoBehaviour
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         Ragdolling(false);
+
+        controlEventManager.AddRagdollListener(Ragdolling);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (Math.Abs(rb.linearVelocity.y) > speedLimitBeforeRagdolling || Math.Abs(rb.linearVelocity.x) > speedLimitBeforeRagdolling || Math.Abs(rb.linearVelocity.z) > speedLimitBeforeRagdolling)
-            Ragdolling(true);
-    }
 
     /*Activate or deactivate ragdolling*/
     void Ragdolling(bool ragdolling)
@@ -47,13 +42,6 @@ public class Ragdoller : MonoBehaviour
                 //  personaggio correttamente quando si ripristinerà dopo la ragdoll
                 if (ragdollReference == null && otherRigid.transform != null)
                     ragdollReference = otherRigid.gameObject;
-            }
-
-
-            if (otherRigid == r.Last())
-            {
-                Debug.Log("Ragdolling: " + ragdolling);
-                onRagdolling?.Invoke(ragdolling, otherRigid.gameObject);
             }
 
         }

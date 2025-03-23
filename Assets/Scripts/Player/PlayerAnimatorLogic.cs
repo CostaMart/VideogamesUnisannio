@@ -1,8 +1,9 @@
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
 
-public class TPSAnimatorManager : MonoBehaviour
+public class PlayerAnimatorLogic : MonoBehaviour
 {
     public RigBuilder rb;
     [SerializeField] private EquipmentEventManager equipmentEventManager;
@@ -21,7 +22,7 @@ public class TPSAnimatorManager : MonoBehaviour
 
 
     [Header("Right Hand Settings")]
-    [Tooltip("this constraint is required to move the character left hand in order to grab the weapon")]
+    [Tooltip("this constraint is required to move the character right hand in order to grab the weapon")]
     public TwoBoneIKConstraint twoBoneIKConstraintR;
     [Tooltip("reference to the right hand Ik target transform")]
     public Transform IKRightHand;
@@ -33,24 +34,30 @@ public class TPSAnimatorManager : MonoBehaviour
     public Transform relaxedWeaponStand;
     [Tooltip("represents the postion of the weapon when the character is aiming")]
     public Transform aimingWeaponStand;
-    [Tooltip("reference to the transform representing where the left hand should be placed on the weapon when the character is aiming")]
-    public Transform wpnFrontHandle;
     [Tooltip("constraing applied to weapon to rotate it thowrds the aim direction")]
     public MultiRotationConstraint weaponDirectionConstraint;
-
 
     [Tooltip("reference to the transform representing where the left hand should be placed on the weapon when the character is not aiming")]
     public Transform wpnBackHandle;
 
+    [Tooltip("reference to the transform representing where the left hand should be placed on the weapon when the character is aiming")]
+    public Transform wpnFrontHandle;
+
 
     [Header("Pistol Settings")]
+    [SerializeField] private GameObject pistolObject;
     [Tooltip("reference to the transform representing where the left hand should be placed on the pistol when the character is aiming")]
     [SerializeField] private Transform PistleHandle;
     [SerializeField] private Transform PistolRightHandle;
+    [SerializeField] private Transform PistolRelaxedPosition;
 
+    [SerializeField] private Transform PistolAimingPosition;
+
+
+    [Header("Other body parts settings")]
+    [SerializeField] private MultiRotationConstraint headRotationConstraint;
 
     Animator animator;
-
 
     private bool aiming = false;
     private bool lastWas = false;
@@ -70,6 +77,9 @@ public class TPSAnimatorManager : MonoBehaviour
     private bool pistol = false;
     void Start()
     {
+        if (headRotationConstraint == null)
+            Debug.LogWarning("Head rotation constraint is null, head rotation will not be controlled");
+
         // input system setup
         move = playerInput.actions["Move"];
         jump = playerInput.actions["Jump"];
@@ -97,15 +107,17 @@ public class TPSAnimatorManager : MonoBehaviour
 
 
         // equipment event manager setup
+        // si ascolta l'evento di cambio arma per cambiare la posizione della mano sinistra a seconda dell'arma impugnata. cambio possibile solo se non si sta mirando.
         equipmentEventManager.AddListenerWeaponSelected((index) =>
         {
             if (aiming) return;
-
             if (index == 2)
             {
-                Debug.Log("pistol");
                 pistol = true;
                 animator.SetBool("pistol_eq", true);
+                pistolObject.transform.SetParent(PistolRelaxedPosition);
+                pistolObject.transform.localPosition = Vector3.zero;
+                pistolObject.transform.localRotation = Quaternion.identity;
             }
             else if (index == 1)
             {
@@ -135,10 +147,25 @@ public class TPSAnimatorManager : MonoBehaviour
         {
             if (!lastWas)
             {
+                // se il constraint per la testa è impostato ruotala
+                if (headRotationConstraint != null)
+                {
+                    headRotationConstraint.weight = 1;
+                }
+
                 lastWas = true;
-                weapon.transform.SetParent(aimingWeaponStand);
-                weapon.transform.localPosition = Vector3.zero;
-                weapon.transform.localRotation = Quaternion.identity;
+                if (!pistol)
+                {
+                    weapon.transform.SetParent(aimingWeaponStand);
+                    weapon.transform.localPosition = Vector3.zero;
+                    weapon.transform.localRotation = Quaternion.identity;
+                }
+                else
+                {
+                    pistolObject.transform.SetParent(PistolAimingPosition);
+                    pistolObject.transform.localPosition = Vector3.zero;
+                    pistolObject.transform.localRotation = Quaternion.identity;
+                }
 
                 //1* qui cambiamo il punto verso cui il personaggio si rivolge, quando miriamo lo facciamo girare leggermente più a destra per un effetto migliore
                 var newSourceObject = aimConstraint.data.sourceObjects;
@@ -149,6 +176,7 @@ public class TPSAnimatorManager : MonoBehaviour
                 newConstraintData.offset = new Vector3(-27.3f, 0, 0);
                 aimConstraint.data = newConstraintData;
                 aimConstraint.data.sourceObjects = newSourceObject;
+
                 twoBoneIKConstraintL.weight = 1;
                 weaponDirectionConstraint.weight = 1;
                 rb.Build();
@@ -176,10 +204,24 @@ public class TPSAnimatorManager : MonoBehaviour
         // se non stiamo mirando spostiamo l'arma nella posizione di riposo, si controlla lastwas per non farlo ripetutamente
         if (!aiming && lastWas)
         {
+            if (headRotationConstraint != null)
+            {
+                headRotationConstraint.weight = 0;
+            }
+
             lastWas = false;
-            weapon.transform.SetParent(relaxedWeaponStand);
-            weapon.transform.localPosition = Vector3.zero;
-            weapon.transform.localRotation = Quaternion.identity;
+            if (!pistol)
+            {
+                weapon.transform.SetParent(relaxedWeaponStand);
+                weapon.transform.localPosition = Vector3.zero;
+                weapon.transform.localRotation = Quaternion.identity;
+            }
+            else
+            {
+                pistolObject.transform.SetParent(PistolRelaxedPosition);
+                pistolObject.transform.localPosition = Vector3.zero;
+                pistolObject.transform.localRotation = Quaternion.identity;
+            }
 
             // questo è il duale del commento 1*, se non stiamo mirando vogliamo il personaggio rivolto in avanti 
             var newSourceObject = aimConstraint.data.sourceObjects;

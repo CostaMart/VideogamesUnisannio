@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -10,6 +11,9 @@ public class ControlEventManager : ScriptableObject
     private UnityAction<Vector2> OnMove;
     private UnityAction OnFire;
     private UnityAction OnReload;
+    private UnityAction<bool> Ragdoll;
+
+    private UnityAction<Vector2> OnMouseControl;
 
     public void AddListenerAiming(UnityAction<bool> listener)
     {
@@ -51,5 +55,24 @@ public class ControlEventManager : ScriptableObject
         OnFire?.Invoke();
     }
 
+    public void AddRagdollListener(UnityAction<bool> listener)
+    {
+        Ragdoll += listener;
+    }
+
+    public void raiseRagdollEvent(bool value)
+    {
+        Ragdoll?.Invoke(value);
+    }
+
+    public void AddMouseControlListener(UnityAction<Vector2> listener)
+    {
+        OnMouseControl += listener;
+    }
+
+    public void raiseMouseControlEvent(Vector2 rotation)
+    {
+        OnMouseControl?.Invoke(rotation);
+    }
 
 }

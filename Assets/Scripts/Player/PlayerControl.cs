@@ -1,12 +1,14 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(CharMovementLogic))]
+[RequireComponent(typeof(MovementLogic))]
 public class PlayerControlManager : MonoBehaviour
 {
+    // physic checks
+    private Rigidbody rb;
 
     // input actions
-
     public PlayerInput playerInput;
 
     private InputAction aim;
@@ -15,20 +17,24 @@ public class PlayerControlManager : MonoBehaviour
     private InputAction jump;
     private InputAction wpn1;
     private InputAction wpn2;
-    private CharMovementLogic charMovementLogic;
+    private MovementLogic charMovementLogic;
 
     // fight controls
     private InputAction fireAction;
     private InputAction reloadAction;
+    private InputAction lookAction;
 
+    // ragdolling controll
 
+    [SerializeField] private PlayerSettings playerSettings;
     [SerializeField] private ControlEventManager ControlEventManager;
     [SerializeField] private EquipmentEventManager EquipmentEventManager;
     // ------------------------------------
     void Awake()
     {
+        rb = GetComponent<Rigidbody>();
 
-        charMovementLogic = GetComponent<CharMovementLogic>();
+        charMovementLogic = GetComponent<MovementLogic>();
 
         if (charMovementLogic == null) return;
 
@@ -38,6 +44,7 @@ public class PlayerControlManager : MonoBehaviour
         jump = playerInput.actions["Jump"];
         wpn1 = playerInput.actions["Wpn1"];
         wpn2 = playerInput.actions["Wpn2"];
+        lookAction = playerInput.actions["Look"];
 
         // movement controls
         aim.performed += ctx => { charMovementLogic.Aiming = true; };
@@ -55,5 +62,16 @@ public class PlayerControlManager : MonoBehaviour
 
         // fight controls
         reloadAction = playerInput.actions["Reload"];
+
+        // camera control 
+        lookAction.performed += ctx => { ControlEventManager.raiseMouseControlEvent(ctx.ReadValue<Vector2>()); };
+        lookAction.canceled += ctx => { ControlEventManager.raiseMouseControlEvent(Vector2.zero); };
+    }
+    void Update()
+    {
+        if (Math.Abs(rb.linearVelocity.y) > playerSettings.SpeedLimitBeforeRagdolling || Math.Abs(rb.linearVelocity.x) > playerSettings.SpeedLimitBeforeRagdolling || Math.Abs(rb.linearVelocity.z) > playerSettings.SpeedLimitBeforeRagdolling)
+        {
+            ControlEventManager.raiseRagdollEvent(true);
+        }
     }
 }
