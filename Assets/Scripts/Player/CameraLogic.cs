@@ -80,14 +80,17 @@ public class MouseRotateCamera : MonoBehaviour
         rotationX -= delta.y * settings.Sensitivity;  // Ruota sull'asse X (verticale)
 
         // Limita la rotazione X per evitare rotazioni strane
-        rotationX = Mathf.Clamp(rotationX, -50f, 90f);
+        rotationX = Mathf.Clamp(rotationX, settings.LowerBoundYrotation, settings.UpperBoundYrotation);
 
-        // Ruota la telecamera in modo fluido (più lento se il mouse si sposta meno)
+        // logica di rotazione a ragdoll disattivo
         if (!ragdolling)
+
         {
             // Se non siamo in ragdoll, usa la rotazione X e Y specificate
             transform.rotation = Quaternion.Euler(rotationX, rotationY, 0f);
         }
+
+        // logica di rotazione a ragdoll attivo
         else
         {
             // Se siamo in ragdoll, mantieni l'oggetto orientato verso l'alto lungo l'asse Y
@@ -103,9 +106,9 @@ public class MouseRotateCamera : MonoBehaviour
         ragdolling = isRagdolling;
     }
 
-    public void OnMouseRotation(Vector2 v)
+    public void OnMouseRotation(Vector2 rotation)
     {
-        delta = v;
+        delta = rotation;
     }
 }
 

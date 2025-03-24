@@ -10,11 +10,13 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private GameObject _weaponsSecondary;
     [SerializeField] private EquipmentEventManager _equipmentEventManager;
     [SerializeField] private ControlEventManager _controlEventManager;
+
+
     void Awake()
     {
         _controlEventManager.AddListenerAiming((value) => { aiming = value; });
-
         _equipmentEventManager.AddListenerWeaponSelected((index) =>
+
         {
             if (aiming) return;
 
@@ -25,13 +27,11 @@ public class InventoryManager : MonoBehaviour
 
             if (_currentWeaponIndex == 1)
             {
-
                 _weaponsPrimary.SetActive(true);
                 _weaponsSecondary.SetActive(false);
             }
             else if (_currentWeaponIndex == 2)
             {
-
                 _weaponsPrimary.SetActive(false);
                 _weaponsSecondary.SetActive(true);
             }
