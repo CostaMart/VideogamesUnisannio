@@ -11,7 +11,6 @@ public class HittableCharacter : MonoBehaviour
         if (collision.gameObject.CompareTag("Bullet"))
         {
             Debug.Log("remaining life: " + charStats.Life);
-            charStats.AddToLife(-10);
         }
     }
 
