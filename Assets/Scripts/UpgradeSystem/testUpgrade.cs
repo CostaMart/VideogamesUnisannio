@@ -1,10 +1,25 @@
+using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
-class testUpdate : MonoBehaviour, IUpgradable
+class testUpdate : MonoBehaviour, IAffectable
 {
     public int ID => 1;
-    public void Upgrade(Upgrade upgrade)
+    [SerializeField] public float theParam;
+
+    public void AutoApplyEffect(IEffect upgrade)
     {
-        Debug.Log("got a fantastic update of type " + upgrade.value);
+        throw new System.NotImplementedException();
+    }
+
+    public float ResolveParameterValueByID(int id)
+    {
+        return theParam;
+    }
+
+
+    public void AutoApplyEffect(int targetAttribute, Func<float, float> upgrade)
+    {
+        Debug.Log("Applying effect to " + targetAttribute + " with value " + upgrade(theParam));
     }
 }

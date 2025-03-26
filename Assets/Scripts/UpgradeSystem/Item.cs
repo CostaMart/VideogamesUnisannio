@@ -3,5 +3,5 @@ using UnityEngine;
 
 public class Item
 {
-    public List<Upgrade> upgrades = new List<Upgrade>();
+    public List<IEffect> effects = new List<IEffect>();
 }

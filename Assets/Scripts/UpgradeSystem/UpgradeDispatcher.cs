@@ -5,90 +5,55 @@ using UnityEngine;
 public class UpgradeDispatcher : MonoBehaviour
 {
 
-    [SerializeField] IUpgradable[] upgraders = new IUpgradable[3];
+    [SerializeField] IAffectable[] upgraders = new IAffectable[3];
     [SerializeField] private ControlEventManager controlEventManager;
 
-    private List<Upgrade> activeOvertime = new List<Upgrade>();
+    private List<SingleActivationIncrementEffect> activeOvertime = new List<SingleActivationIncrementEffect>();
     // test
     void Awake()
     {
-        FindComponentsInChildren<IUpgradable>(transform);
+        FindComponentsInChildren<IAffectable>(transform);
     }
     void Update()
     {
-        for (int i = activeOvertime.Count - 1; i >= 0; i--)
-        {
-            Upgrade up = activeOvertime[i];
-
-            if (Time.time >= up.nextTickTime)
-            {
-                up.nextTickTime = Time.time + up.tickTime;
-                up.tickNumber++;
-
-                if (up.tickNumber > up.durationTicks)
-                {
-                    activeOvertime.RemoveAt(i);
-                    continue;
-                }
-
-                UpgradeActivate(up);
-            }
-        }
-
         // PROTO: solo per prototipazione, verranno eliminati 
         if (Input.GetKeyDown(KeyCode.E))
         {
             Debug.Log("Dispatching upgrade");
-            Upgrade up = new Upgrade();
-            up.classTarget = 0;
-            up.attributeTarget = 6;
-            up.value = 200;
-            up.operation = (float operand) => operand + 100;
+            SingleActivationIncrementEffect up = new SingleActivationIncrementEffect();
             Item it = new Item();
-            it.upgrades.Add(up);
-
-            OnItemPickUp(it);
-        }
-
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            Debug.Log("Dispatching upgrade");
-            Upgrade up = new Upgrade();
-            up.classTarget = 1;
-            up.value = 200;
-            up.operation = (float operand) => operand + 100;
-            up.isOvertime = true;
-            up.tickTime = 1;
-            up.durationTicks = 20;
-            Item it = new Item();
-            it.upgrades.Add(up);
-
+            up.targetClassID = 0;
+            up.targetAttributeID = 4;
+            up.value = 143;
+            it.effects.Add(up);
             OnItemPickUp(it);
         }
     }
-    public void UpgradeActivate(Upgrade up)
-    {
-        upgraders[up.classTarget].Upgrade(up);
-    }
 
-    public void OnItemPickUp(Item item)
+    public void OnItemPickUp(Item it)
     {
-        foreach (Upgrade up in item.upgrades)
+        foreach (var up in it.effects)
         {
-            if (up.isOvertime)
-            {
-                activeOvertime.Add(up);
-            }
+            if (up.referecedAttributeClass != -1)
+                ResolveValue(up);
 
-            else
-            {
-                UpgradeActivate(up);
-            }
-
+            up.ActivateEffect(upgraders[up.targetClassID], this);
         }
     }
 
-    void FindComponentsInChildren<T>(Transform parent) where T : IUpgradable
+    /// <summary>
+    /// if the effect has a reference to an attribute in a class , this method is called to resolve the value of the reference
+    /// </summary>
+    /// <param name="effect"></param>
+    void ResolveValue(IEffect effect)
+    {
+        var referencedClass = upgraders[effect.referecedAttributeClass];
+        float referencedAttributeVal = referencedClass.ResolveParameterValueByID(effect.referencedAttribute);
+        effect.value = referencedAttributeVal;
+    }
+
+
+    void FindComponentsInChildren<T>(Transform parent) where T : IAffectable
     {
         var components = parent.GetComponents<Component>();
 

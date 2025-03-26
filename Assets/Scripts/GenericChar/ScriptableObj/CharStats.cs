@@ -3,7 +3,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 [System.Serializable]
-public class CharStats : MonoBehaviour, IUpgradable
+public class CharStats : MonoBehaviour, IAffectable
 {
     public int ID => 0;
 
@@ -28,69 +28,61 @@ public class CharStats : MonoBehaviour, IUpgradable
     public int MaxJumps => maxJumps;
     public float SpeedLimitBeforeRagdolling => speedLimitBeforeRagdolling;
 
-    private Action<Upgrade>[] updatabales;
+    private Action<Func<float, float>>[] updatabales;
 
     void Start()
     {
-        updatabales = new Action<Upgrade>[]{
-        (up) => { rotationSpeed =  up.operation(rotationSpeed); },
-        (up) => { life = up.operation(life); },
-        (up) => { aimRotationSpeed = up.operation(aimRotationSpeed); },
-        (up) => { jumpSpeed = up.operation(jumpSpeed); },
-        (up) => { moveSpeed = up.operation(moveSpeed); },
-        (up) => { jumpSpeed = up.operation(jumpSpeed); },
-        (up) => { maxJumps =  (int) up.operation(maxJumps); },
-        (up) => { speedLimitBeforeRagdolling = up.operation(speedLimitBeforeRagdolling); }
+        updatabales = new Action<Func<float, float>>[]{
+        (effect) => { rotationSpeed =    effect(rotationSpeed); },
+        (effect) => { life =             effect(life); },
+        (effect) => { aimRotationSpeed = effect(aimRotationSpeed); },
+        (effect) => { jumpSpeed =        effect(jumpSpeed); },
+        (effect) => { moveSpeed =        effect(moveSpeed); },
+        (effect) => { jumpSpeed =        effect(jumpSpeed); },
+        (effect) => { maxJumps =  (int)  effect(maxJumps); },
+        (effect) => { speedLimitBeforeRagdolling = effect(speedLimitBeforeRagdolling); }
     };
 
     }
-    public void Upgrade(Upgrade upgrade)
+    public void AutoApplyEffect(int targetAttribute, Func<float, float> upgrade)
     {
-        updatabales[upgrade.attributeTarget](upgrade);
-        {
-            /*
-            float op1;
-            switch (upgrade.attributeTarget)
-            {
-                case (int)UpgradeType.RotationSpeed:
-                    op1 = rotationSpeed;
-                    rotationSpeed = upgrade.operation(op1);
-                    break;
-                case (int)UpgradeType.Life:
-                    op1 = life;
-                    life = upgrade.operation(op1);
-                    break;
-                case (int)UpgradeType.AimRotationSpeed:
-                    op1 = aimRotationSpeed;
-                    aimRotationSpeed = upgrade.operation(op1);
-                    break;
-                case (int)UpgradeType.JumpSpeed:
-                    op1 = jumpSpeed;
-                    jumpSpeed = upgrade.operation(op1);
-                    break;
-                case (int)UpgradeType.MoveSpeed:
-                    op1 = moveSpeed;
-                    moveSpeed = upgrade.operation(op1);
-                    break;
-                case (int)UpgradeType.AnotherJumpSpeed:
-                    op1 = jumpSpeed;
-                    jumpSpeed = upgrade.operation(op1);
-                    break;
-                case (int)UpgradeType.MaxJumps:
-                    op1 = maxJumps;
-                    maxJumps = (int)upgrade.operation(op1);
-                    break;
-                case (int)UpgradeType.SpeedLimitBeforeRagdolling:
-                    op1 = speedLimitBeforeRagdolling;
-                    speedLimitBeforeRagdolling = upgrade.operation(op1);
-                    break;
-                default:
-                    op1 = 0;
-                    break;
+        updatabales[targetAttribute](upgrade);
+    }
 
-            }
-            */
+    public float ResolveParameterValueByID(int id)
+    {
+        float ret;
+        switch ((UpgradeType)id)
+        {
+            case UpgradeType.RotationSpeed:
+                ret = rotationSpeed;
+                break;
+            case UpgradeType.Life:
+                ret = life;
+                break;
+            case UpgradeType.AimRotationSpeed:
+                ret = aimRotationSpeed;
+                break;
+            case UpgradeType.JumpSpeed:
+                ret = jumpSpeed;
+                break;
+            case UpgradeType.MoveSpeed:
+                ret = moveSpeed;
+                break;
+            case UpgradeType.AnotherJumpSpeed:
+                ret = jumpSpeed;
+                break;
+            case UpgradeType.MaxJumps:
+                ret = maxJumps;
+                break;
+            case UpgradeType.SpeedLimitBeforeRagdolling:
+                ret = speedLimitBeforeRagdolling;
+                break;
+            default:
+                ret = 0;
+                break;
         }
+        return ret;
     }
 
     private enum UpgradeType
