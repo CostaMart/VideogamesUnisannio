@@ -34,7 +34,7 @@ public interface IEffect
     /// </summary>
     /// <param name="upgradable"></param>
     /// <param name="dipsatcher"></param>
-    public void ActivateEffect(IAffectable upgradable, UpgradeDispatcher dipsatcher);
+    public void ActivateEffect(IAffectable upgradable, EffectsDispatcher dipsatcher);
 
 
 }

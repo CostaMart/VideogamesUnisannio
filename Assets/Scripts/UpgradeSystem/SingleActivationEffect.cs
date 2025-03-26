@@ -12,7 +12,7 @@ public class SingleActivationIncrementEffect : IEffect
 
     public float value { get; set; }
 
-    public void ActivateEffect(IAffectable upgradable, UpgradeDispatcher dipsatcher)
+    public void ActivateEffect(IAffectable upgradable, EffectsDispatcher dipsatcher)
     {
         upgradable.AutoApplyEffect(targetAttributeID, (f1) => { return f1 + value; });
     }

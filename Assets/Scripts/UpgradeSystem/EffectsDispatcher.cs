@@ -1,15 +1,18 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
-public class UpgradeDispatcher : MonoBehaviour
+/// <summary>
+/// This component is responsible for dispatching the effects to the correct classes, and serves as a
+/// bridge between the upgrades and all the gameobject components which could be useful to implement effects
+/// </summary>
+public class EffectsDispatcher : MonoBehaviour
 {
 
-    [SerializeField] IAffectable[] upgraders = new IAffectable[3];
+    [SerializeField] IAffectable[] affectables = new IAffectable[3];
     [SerializeField] private ControlEventManager controlEventManager;
 
     private List<SingleActivationIncrementEffect> activeOvertime = new List<SingleActivationIncrementEffect>();
-    // test
+
     void Awake()
     {
         FindComponentsInChildren<IAffectable>(transform);
@@ -37,7 +40,7 @@ public class UpgradeDispatcher : MonoBehaviour
             if (up.referecedAttributeClass != -1)
                 ResolveValue(up);
 
-            up.ActivateEffect(upgraders[up.targetClassID], this);
+            up.ActivateEffect(affectables[up.targetClassID], this);
         }
     }
 
@@ -47,7 +50,7 @@ public class UpgradeDispatcher : MonoBehaviour
     /// <param name="effect"></param>
     void ResolveValue(IEffect effect)
     {
-        var referencedClass = upgraders[effect.referecedAttributeClass];
+        var referencedClass = affectables[effect.referecedAttributeClass];
         float referencedAttributeVal = referencedClass.ResolveParameterValueByID(effect.referencedAttribute);
         effect.value = referencedAttributeVal;
     }
@@ -62,7 +65,7 @@ public class UpgradeDispatcher : MonoBehaviour
             if (component is T upgradable)
             {
                 Debug.Log("Found IUpgradable component: " + component.GetType().Name);
-                upgraders[upgradable.ID] = upgradable;
+                affectables[upgradable.ID] = upgradable;
             }
         }
 
