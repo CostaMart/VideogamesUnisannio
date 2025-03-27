@@ -3,7 +3,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 [System.Serializable]
-public class CharStats : MonoBehaviour, AbstractAffectable
+public class CharStats : MonoBehaviour, IAffectable
 {
     public int ID => 0;
 

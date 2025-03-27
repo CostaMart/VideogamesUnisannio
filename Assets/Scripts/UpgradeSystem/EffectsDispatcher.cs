@@ -10,14 +10,14 @@ using UnityEngine;
 public class EffectsDispatcher : MonoBehaviour
 {
 
-    [SerializeField] AbstractAffectable[] affectables = new AbstractAffectable[3];
+    [SerializeField] IAffectable[] affectables = new IAffectable[3];
     [SerializeField] private ControlEventManager controlEventManager;
 
     private List<SingleActivationEffect> activeOvertime = new List<SingleActivationEffect>();
 
     void Awake()
     {
-        FindComponentsInChildren<AbstractAffectable>(transform);
+        FindComponentsInChildren<IAffectable>(transform);
     }
 
     void Update()
@@ -28,7 +28,7 @@ public class EffectsDispatcher : MonoBehaviour
             Debug.Log("Dispatching upgrade");
 
             // dispatcher doesn't care of which type of effect it is activating
-            IEffect up = new SingleActivationEffect(0, 4, (value) => value + 1000);
+            AbstractEffect up = new SingleActivationEffect(0, 4, (value) => value + 1000);
             Item it = new Item();
 
             it.effects.Add(up);
@@ -38,7 +38,7 @@ public class EffectsDispatcher : MonoBehaviour
 
     public void OnItemPickUp(Item it)
     {
-        foreach (IEffect up in it.effects)
+        foreach (AbstractEffect up in it.effects)
         {
             if (up.referecedAttributeClassID != null)
                 up.newValue = ResolveValue(up.referecedAttributeClassID.Value, up.referencedAttributeID.Value);
@@ -59,7 +59,7 @@ public class EffectsDispatcher : MonoBehaviour
     }
 
 
-    private void FindComponentsInChildren<T>(Transform parent) where T : AbstractAffectable
+    private void FindComponentsInChildren<T>(Transform parent) where T : IAffectable
     {
         var components = parent.GetComponents<Component>();
 

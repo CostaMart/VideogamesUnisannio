@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// simply sets effect once
 /// </summary>
-public class SingleActivationEffect : IEffect
+public class SingleActivationEffect : AbstractEffect
 {
     public SingleActivationEffect(int targetClassID,
     int targetAttributeID, ApplyEffect effect) : base(targetClassID, targetAttributeID, effect) { }
@@ -14,7 +14,7 @@ public class SingleActivationEffect : IEffect
       referencedAttributeID)
     { }
 
-    public override void ActivateEffect(AbstractAffectable upgradable, EffectsDispatcher dipsatcher)
+    public override void ActivateEffect(IAffectable upgradable, EffectsDispatcher dipsatcher)
     {
         var val = Apply(newValue);
         upgradable.SetStatByID(targetAttributeID, val);

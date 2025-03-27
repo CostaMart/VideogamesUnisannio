@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Implement this to participate to the upgrade system and define your own effects
 /// </summary>
-public abstract class IEffect
+public abstract class AbstractEffect
 {
     public delegate float ApplyEffect(float newValue);
 
@@ -14,7 +14,7 @@ public abstract class IEffect
     public int targetClassID { get; private set; }
 
     /// <summary>
-    /// ID of the attribute to be affected within the class specified by <see cref="targeClassID"/>
+    /// ID of the attribute to be affected within the class specified by <see cref="targetClassID"/>
     /// </summary>
     public int targetAttributeID { get; private set; }
 
@@ -25,7 +25,7 @@ public abstract class IEffect
     public int? referecedAttributeClassID { get; private set; }
 
     /// <summary>
-    /// By setting referencedAttributeClass to a not null value , you can specify whtih this value which attribute 
+    /// By setting referencedAttributeClass to a not null value , you can specify this value which attribute 
     /// of the class you want to use as parameter.
     /// </summary>
     public int? referencedAttributeID { get; private set; }
@@ -43,13 +43,13 @@ public abstract class IEffect
     /// </summary>
     protected ApplyEffect Apply { get; set; }
 
-    public IEffect(int targetClassID, int targetAttributeID, ApplyEffect effect)
+    public AbstractEffect(int targetClassID, int targetAttributeID, ApplyEffect effect)
     {
         this.targetClassID = targetClassID;
         this.targetAttributeID = targetAttributeID;
         Apply = effect;
     }
-    public IEffect(int targetClassID, int targetAttributeID, ApplyEffect effect, int referencedClassID, int referencedAttributeID)
+    public AbstractEffect(int targetClassID, int targetAttributeID, ApplyEffect effect, int referencedClassID, int referencedAttributeID)
     {
         this.targetClassID = targetClassID;
         this.targetAttributeID = targetAttributeID;
@@ -69,5 +69,5 @@ public abstract class IEffect
     /// Provides access to other game system elements, such as event dispatchers. 
     /// Use this to implement custom behaviors.
     /// </param>
-    public abstract void ActivateEffect(AbstractAffectable target, EffectsDispatcher dipsatcher);
+    public abstract void ActivateEffect(IAffectable target, EffectsDispatcher dipsatcher);
 }

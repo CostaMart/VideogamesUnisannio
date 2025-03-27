@@ -3,5 +3,5 @@ using UnityEngine;
 
 public class Item
 {
-    public List<IEffect> effects = new List<IEffect>();
+    public List<AbstractEffect> effects = new List<AbstractEffect>();
 }

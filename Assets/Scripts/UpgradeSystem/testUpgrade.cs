@@ -2,12 +2,12 @@ using System;
 using Unity.VisualScripting;
 using UnityEngine;
 
-class testUpdate : MonoBehaviour, AbstractAffectable
+class testUpdate : MonoBehaviour, IAffectable
 {
     public int ID => 1;
     [SerializeField] public float theParam;
 
-    public void AutoApplyEffect(IEffect upgrade)
+    public void AutoApplyEffect(AbstractEffect upgrade)
     {
         throw new System.NotImplementedException();
     }
