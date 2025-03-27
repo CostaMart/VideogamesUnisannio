@@ -69,5 +69,5 @@ public abstract class IEffect
     /// Provides access to other game system elements, such as event dispatchers. 
     /// Use this to implement custom behaviors.
     /// </param>
-    public abstract void ActivateEffect(IAffectable target, EffectsDispatcher dipsatcher);
+    public abstract void ActivateEffect(AbstractAffectable target, EffectsDispatcher dipsatcher);
 }

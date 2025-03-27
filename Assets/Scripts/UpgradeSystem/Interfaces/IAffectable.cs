@@ -4,7 +4,7 @@ using System;
 /// A status class that wants to participate to the item upgrade system must implement this interface, 
 /// the effect dispatcher will look for these classes in the gameobject hierarchy.
 /// </summary>
-public interface IAffectable
+public interface AbstractAffectable
 {
     /// <summary>
     /// ID of this affectable type 

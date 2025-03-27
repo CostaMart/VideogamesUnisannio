@@ -10,14 +10,14 @@ using UnityEngine;
 public class EffectsDispatcher : MonoBehaviour
 {
 
-    [SerializeField] IAffectable[] affectables = new IAffectable[3];
+    [SerializeField] AbstractAffectable[] affectables = new AbstractAffectable[3];
     [SerializeField] private ControlEventManager controlEventManager;
 
     private List<SingleActivationEffect> activeOvertime = new List<SingleActivationEffect>();
 
     void Awake()
     {
-        FindComponentsInChildren<IAffectable>(transform);
+        FindComponentsInChildren<AbstractAffectable>(transform);
     }
 
     void Update()
@@ -59,7 +59,7 @@ public class EffectsDispatcher : MonoBehaviour
     }
 
 
-    private void FindComponentsInChildren<T>(Transform parent) where T : IAffectable
+    private void FindComponentsInChildren<T>(Transform parent) where T : AbstractAffectable
     {
         var components = parent.GetComponents<Component>();
 

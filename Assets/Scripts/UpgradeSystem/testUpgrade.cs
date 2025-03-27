@@ -2,7 +2,7 @@ using System;
 using Unity.VisualScripting;
 using UnityEngine;
 
-class testUpdate : MonoBehaviour, IAffectable
+class testUpdate : MonoBehaviour, AbstractAffectable
 {
     public int ID => 1;
     [SerializeField] public float theParam;

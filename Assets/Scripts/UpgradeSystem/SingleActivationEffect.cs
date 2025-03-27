@@ -14,7 +14,7 @@ public class SingleActivationEffect : IEffect
       referencedAttributeID)
     { }
 
-    public override void ActivateEffect(IAffectable upgradable, EffectsDispatcher dipsatcher)
+    public override void ActivateEffect(AbstractAffectable upgradable, EffectsDispatcher dipsatcher)
     {
         var val = Apply(newValue);
         upgradable.SetStatByID(targetAttributeID, val);
