@@ -7,11 +7,6 @@ class testUpdate : MonoBehaviour, IAffectable
     public int ID => 1;
     [SerializeField] public float theParam;
 
-    public void AutoApplyEffect(AbstractEffect upgrade)
-    {
-        throw new System.NotImplementedException();
-    }
-
     public float GetStatByID(int id)
     {
         return theParam;

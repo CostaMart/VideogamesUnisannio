@@ -7,16 +7,15 @@ using UnityEngine;
 public class SingleActivationEffect : AbstractEffect
 {
     public SingleActivationEffect(int targetClassID,
-    int targetAttributeID, ApplyEffect effect) : base(targetClassID, targetAttributeID, effect) { }
+    int targetAttributeID, ApplyEffect effect, float val) : base(targetClassID, targetAttributeID, effect, val) { }
 
     public SingleActivationEffect(int targetClassID, int targetAttributeID, ApplyEffect effect,
      int referencedClassID, int referencedAttributeID) : base(targetClassID, targetAttributeID, effect, referencedClassID,
       referencedAttributeID)
     { }
 
-    public override void ActivateEffect(IAffectable upgradable, EffectsDispatcher dipsatcher)
+    public override void Activate(IAffectable target, EffectsDispatcher dispatcher)
     {
-        var val = Apply(newValue);
-        upgradable.SetStatByID(targetAttributeID, val);
+
     }
 }

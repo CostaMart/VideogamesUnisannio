@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   camera: {fileID: 620560767}
-  playerSettings: {fileID: 11400000, guid: dbdefd1ed0e70f6469c7dda7dc231979, type: 2}
+  playerSettings: {fileID: 18548422}
   controlEventManager: {fileID: 11400000, guid: a8c9cf2bc434199ecac824c6d78347ba, type: 2}
 --- !u!114 &18548412
 MonoBehaviour:
@@ -385,7 +385,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerInput: {fileID: 18548415}
-  playerSettings: {fileID: 11400000, guid: dbdefd1ed0e70f6469c7dda7dc231979, type: 2}
+  playerSettings: {fileID: 18548422}
   ControlEventManager: {fileID: 11400000, guid: a8c9cf2bc434199ecac824c6d78347ba, type: 2}
   EquipmentEventManager: {fileID: 11400000, guid: fdac48c2ab8af0ac8a0b091531fb53ff, type: 2}
 --- !u!114 &18548421
@@ -405,6 +405,38 @@ MonoBehaviour:
   _weaponsSecondary: {fileID: 913687504}
   _equipmentEventManager: {fileID: 11400000, guid: fdac48c2ab8af0ac8a0b091531fb53ff, type: 2}
   _controlEventManager: {fileID: 11400000, guid: a8c9cf2bc434199ecac824c6d78347ba, type: 2}
+--- !u!114 &18548422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18548408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 300648d91b0b8d476997c685b120d12e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotationSpeed: 0.5
+  life: 100
+  aimRotationSpeed: 5
+  jumpSpeed: 5
+  moveSpeed: 5
+  speedLimitBeforeRagdolling: 20
+  maxJumps: 1
+--- !u!114 &18548423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18548408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f4cdbdbe625dd8c2b44117def7b8cee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controlEventManager: {fileID: 11400000, guid: a8c9cf2bc434199ecac824c6d78347ba, type: 2}
 --- !u!4 &33853811 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2836004475591196995, guid: f432554f564e69242897607d34218939, type: 3}
@@ -854,14 +886,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 6093212292097676079, guid: f351ee1e5215b4e78b2bede5f2d5c8a2, type: 3}
-  bulletMaterial: {fileID: 2100000, guid: bd0ced8d6cef4ff6da180e4a204276af, type: 2}
-  bulletStat: {fileID: 11400000, guid: 25d5f8146cbb4a31dbe893f76302add6, type: 2}
   pool: {fileID: 780216143}
-  magCount: 10
-  magSize: 10
-  fireRate: 1
   anim: {fileID: 18548409}
   muzzle: {fileID: 1981075844}
+  magCount: 10
+  weaponStat: {fileID: 0}
   controlEventManager: {fileID: 11400000, guid: a8c9cf2bc434199ecac824c6d78347ba, type: 2}
 --- !u!4 &246219162 stripped
 Transform:
@@ -2223,14 +2252,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 6093212292097676079, guid: f351ee1e5215b4e78b2bede5f2d5c8a2, type: 3}
-  bulletMaterial: {fileID: 2100000, guid: 28c34baef87f00031bb47cd0ef74ab59, type: 2}
-  bulletStat: {fileID: 11400000, guid: 35ea5a5e127c6729da57f1d187a1c5f6, type: 2}
   pool: {fileID: 554421125}
-  magCount: 10
-  magSize: 10
-  fireRate: 1
   anim: {fileID: 18548409}
   muzzle: {fileID: 1013952532}
+  magCount: 10
+  weaponStat: {fileID: 0}
   controlEventManager: {fileID: 11400000, guid: a8c9cf2bc434199ecac824c6d78347ba, type: 2}
 --- !u!4 &1022785176 stripped
 Transform:
@@ -2531,10 +2557,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34be30df2d592bedd85a5f912e670b0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explosionRadius: 5
-  explosionForce: 8000
-  verticalFactor: 3
-  countdown: 3
 --- !u!1 &1141621824
 GameObject:
   m_ObjectHideFlags: 0
@@ -3823,6 +3845,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2836004475591695743, guid: f432554f564e69242897607d34218939, type: 3}
       insertIndex: -1
       addedObject: {fileID: 18548421}
+    - targetCorrespondingSourceObject: {fileID: 2836004475591695743, guid: f432554f564e69242897607d34218939, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 18548422}
+    - targetCorrespondingSourceObject: {fileID: 2836004475591695743, guid: f432554f564e69242897607d34218939, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 18548423}
     - targetCorrespondingSourceObject: {fileID: 2836004475591695707, guid: f432554f564e69242897607d34218939, type: 3}
       insertIndex: -1
       addedObject: {fileID: 737908212}
@@ -4364,8 +4392,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bae89711f13c0d37fb52ec1e9baa3499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  throwForce: 600
-  toThrow: {fileID: 1135970787}
 --- !u!114 &1878102644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4594,8 +4620,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab3a29e3c476405529bb0d7fc9e29270, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rayLength: 10
-  rayColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &2013410473
 GameObject:
   m_ObjectHideFlags: 1

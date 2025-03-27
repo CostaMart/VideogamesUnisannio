@@ -6,7 +6,7 @@ using UnityEngine;
 /// </summary>
 public abstract class AbstractEffect
 {
-    public delegate float ApplyEffect(float newValue);
+    public delegate float ApplyEffect(float newVal, float actualVal);
 
     /// <summary>
     /// ID of the class to be affected
@@ -22,7 +22,7 @@ public abstract class AbstractEffect
     /// by setting this parameter to a not null value different, you can request the dispatcher to resolve the value.
     /// This parameter becomes the index of the class you want to get the value from.
     /// </summary>
-    public int? referecedAttributeClassID { get; private set; }
+    public int? referencedAttributeClassID { get; private set; }
 
     /// <summary>
     /// By setting referencedAttributeClass to a not null value , you can specify this value which attribute 
@@ -40,20 +40,27 @@ public abstract class AbstractEffect
     /// This function can be passed from exteranl sources to change the value computation.
     /// For example you may want to sum something to the referencedValue to generate the newValue,
     /// or you want to multiply it, you can just change what this function outputs in a "strategy pattern" fashion.
+    /// 
+    /// IMPORTANT:
+    /// The first parameter is the new value to be applied to the target attribute.
+    /// The second parameter is the actual value of the target attribute.
+    /// this is what the programmer whose implementing the effect expect to compute the value, so don't do anything fancy here.
+    /// 
     /// </summary>
-    protected ApplyEffect Apply { get; set; }
+    private ApplyEffect Apply { get; set; }
 
-    public AbstractEffect(int targetClassID, int targetAttributeID, ApplyEffect effect)
+    public AbstractEffect(int targetClassID, int targetAttributeID, ApplyEffect effect, float value)
     {
         this.targetClassID = targetClassID;
         this.targetAttributeID = targetAttributeID;
+        this.newValue = value;
         Apply = effect;
     }
     public AbstractEffect(int targetClassID, int targetAttributeID, ApplyEffect effect, int referencedClassID, int referencedAttributeID)
     {
         this.targetClassID = targetClassID;
         this.targetAttributeID = targetAttributeID;
-        referecedAttributeClassID = referencedClassID;
+        referencedAttributeClassID = referencedClassID;
         this.referencedAttributeID = referencedAttributeID;
         Apply = effect;
     }
@@ -69,5 +76,20 @@ public abstract class AbstractEffect
     /// Provides access to other game system elements, such as event dispatchers. 
     /// Use this to implement custom behaviors.
     /// </param>
-    public abstract void ActivateEffect(IAffectable target, EffectsDispatcher dipsatcher);
+    protected void DoEffect(IAffectable target, EffectsDispatcher dipsatcher)
+    {
+        var val = Apply(newValue, target.GetStatByID(targetAttributeID));
+        target.SetStatByID(targetAttributeID, val);
+    }
+
+    /// <summary>
+    /// define here the activation logic of the effect.
+    /// to apply the effect call <see cref="DoEffect"/> method.
+    /// <paramref name="dispatcher"/> is used to access other game systems.
+    /// <paramref name="target"/> is the target of the effect.
+    /// 
+    /// </summary>
+    /// 
+    /// TODO: potrei voler levare target come parametro per impedire a chi scrive gli effetti di fare cose strane
+    public abstract void Activate(IAffectable target, EffectsDispatcher dispatcher);
 }
