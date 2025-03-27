@@ -1,20 +1,22 @@
 using System;
 using UnityEngine;
 
-public class SingleActivationIncrementEffect : IEffect
+/// <summary>
+/// simply sets effect once
+/// </summary>
+public class SingleActivationEffect : IEffect
 {
-    public int targetClassID { get; set; }
-    public int targetAttributeID { get; set; }
+    public SingleActivationEffect(int targetClassID,
+    int targetAttributeID, ApplyEffect effect) : base(targetClassID, targetAttributeID, effect) { }
 
-    public int referecedAttributeClass => -1;
+    public SingleActivationEffect(int targetClassID, int targetAttributeID, ApplyEffect effect,
+     int referencedClassID, int referencedAttributeID) : base(targetClassID, targetAttributeID, effect, referencedClassID,
+      referencedAttributeID)
+    { }
 
-    public int referencedAttribute => -1;
-
-    public float value { get; set; }
-
-    public void ActivateEffect(IAffectable upgradable, EffectsDispatcher dipsatcher)
+    public override void ActivateEffect(IAffectable upgradable, EffectsDispatcher dipsatcher)
     {
-        upgradable.AutoApplyEffect(targetAttributeID, (f1) => { return f1 + value; });
+        var val = Apply(newValue);
+        upgradable.SetStatByID(targetAttributeID, val);
     }
-
 }

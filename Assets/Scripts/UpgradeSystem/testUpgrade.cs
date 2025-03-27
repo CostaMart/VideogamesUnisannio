@@ -12,14 +12,13 @@ class testUpdate : MonoBehaviour, IAffectable
         throw new System.NotImplementedException();
     }
 
-    public float ResolveParameterValueByID(int id)
+    public float GetStatByID(int id)
     {
         return theParam;
     }
 
-
-    public void AutoApplyEffect(int targetAttribute, Func<float, float> upgrade)
+    public void SetStatByID(int id, float newValue)
     {
-        Debug.Log("Applying effect to " + targetAttribute + " with value " + upgrade(theParam));
+        Debug.Log("Applying effect to " + id + " with value " + newValue);
     }
 }

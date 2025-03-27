@@ -25,28 +25,28 @@ public class CharStats : MonoBehaviour, IAffectable
     public int MaxJumps => maxJumps;
     public float SpeedLimitBeforeRagdolling => speedLimitBeforeRagdolling;
 
-    private Action<Func<float, float>>[] updatabales;
+    private Action<float>[] updatabales;
 
     void Start()
     {
-        updatabales = new Action<Func<float, float>>[]{
-        (effect) => { rotationSpeed =    effect(rotationSpeed); },
-        (effect) => { life =             effect(life); },
-        (effect) => { aimRotationSpeed = effect(aimRotationSpeed); },
-        (effect) => { jumpSpeed =        effect(jumpSpeed); },
-        (effect) => { moveSpeed =        effect(moveSpeed); },
-        (effect) => { jumpSpeed =        effect(jumpSpeed); },
-        (effect) => { maxJumps =  (int)  effect(maxJumps); },
-        (effect) => { speedLimitBeforeRagdolling = effect(speedLimitBeforeRagdolling); }
+        updatabales = new Action<float>[]{
+        (newVal) => { rotationSpeed =    newVal; },
+        (newVal) => { life =             newVal; },
+        (newVal) => { aimRotationSpeed = newVal; },
+        (newVal) => { jumpSpeed =        newVal; },
+        (newVal) => { moveSpeed =        newVal; },
+        (newVal) => { jumpSpeed =        newVal; },
+        (newVal) => { maxJumps =   (int) newVal; },
+        (newVal) => { speedLimitBeforeRagdolling = newVal; }
     };
 
     }
-    public void AutoApplyEffect(int targetAttribute, Func<float, float> upgrade)
+    public void SetStatByID(int targetAttribute, float upgrade)
     {
         updatabales[targetAttribute](upgrade);
     }
 
-    public float ResolveParameterValueByID(int id)
+    public float GetStatByID(int id)
     {
         float ret;
         switch ((UpgradeType)id)
