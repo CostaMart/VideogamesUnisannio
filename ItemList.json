@@ -1,0 +1,16 @@
+{
+    "items": [
+        {
+            "id": 0,
+            "effects": [
+                {
+                    "effectType": "ot",
+                    "targetClass": 0,
+                    "targetStat": 4,
+                    "effectOperand": "add",
+                    "effectValue": "100"
+                }
+            ]
+        }
+    ]
+}

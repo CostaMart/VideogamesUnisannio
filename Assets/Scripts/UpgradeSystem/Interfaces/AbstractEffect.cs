@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -7,6 +8,8 @@ using UnityEngine;
 public abstract class AbstractEffect
 {
     public delegate float ApplyEffect(float newVal, float actualVal);
+
+    public int name { get; private set; }
 
     /// <summary>
     /// ID of the class to be affected
@@ -49,20 +52,43 @@ public abstract class AbstractEffect
     /// </summary>
     private ApplyEffect Apply { get; set; }
 
-    public AbstractEffect(int targetClassID, int targetAttributeID, ApplyEffect effect, float value)
+    public AbstractEffect(Dictionary<string, string> data)
     {
-        this.targetClassID = targetClassID;
-        this.targetAttributeID = targetAttributeID;
-        this.newValue = value;
-        Apply = effect;
-    }
-    public AbstractEffect(int targetClassID, int targetAttributeID, ApplyEffect effect, int referencedClassID, int referencedAttributeID)
-    {
-        this.targetClassID = targetClassID;
-        this.targetAttributeID = targetAttributeID;
-        referencedAttributeClassID = referencedClassID;
-        this.referencedAttributeID = referencedAttributeID;
-        Apply = effect;
+        this.targetClassID = int.Parse(data["targetClass"]);
+        Debug.Log("targetClassID: " + targetClassID);
+        this.targetAttributeID = int.Parse(data["targetStat"]);
+
+        if (data.ContainsKey("referencedAttributeClassID"))
+            this.referencedAttributeClassID = int.Parse(data["referencedAttributeClassID"]);
+
+        if (data.ContainsKey("referencedAttributeID"))
+            this.referencedAttributeID = int.Parse(data["referencedAttributeID"]);
+
+        if (data.ContainsKey("effectValue"))
+            this.newValue = float.Parse(data["effectValue"]);
+
+        if (data.ContainsKey("effectOperand"))
+            switch ((string)data["effectOperand"])
+            {
+                case "add":
+                    Apply = (newVal, actualVal) => newVal + actualVal;
+                    break;
+                case "multiply":
+                    Apply = (newVal, actualVal) => newVal * actualVal;
+                    break;
+                case "divide":
+                    Apply = (newVal, actualVal) => newVal / actualVal;
+                    break;
+                case "subtract":
+                    Apply = (newVal, actualVal) => newVal - actualVal;
+                    break;
+                case "set":
+                    Apply = (newVal, actualVal) => newVal;
+                    break;
+                default:
+                    Apply = (newVal, actualVal) => newVal;
+                    break;
+            }
     }
 
     /// <summary>
@@ -76,7 +102,7 @@ public abstract class AbstractEffect
     /// Provides access to other game system elements, such as event dispatchers. 
     /// Use this to implement custom behaviors.
     /// </param>
-    protected void DoEffect(IAffectable target, EffectsDispatcher dipsatcher)
+    protected void DoEffect(AbstractStatus target)
     {
         var val = Apply(newValue, target.GetStatByID(targetAttributeID));
         target.SetStatByID(targetAttributeID, val);
@@ -91,5 +117,7 @@ public abstract class AbstractEffect
     /// </summary>
     /// 
     /// TODO: potrei voler levare target come parametro per impedire a chi scrive gli effetti di fare cose strane
-    public abstract void Activate(IAffectable target, EffectsDispatcher dispatcher);
+    public abstract void Activate(AbstractStatus target, EffectsDispatcher dispatcher);
+
+
 }

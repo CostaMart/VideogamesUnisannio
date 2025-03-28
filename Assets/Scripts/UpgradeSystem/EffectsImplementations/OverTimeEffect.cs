@@ -1,4 +1,5 @@
 
+using System.Collections.Generic;
 using UnityEngine;
 
 class OverTimeEffect : AbstractEffect
@@ -12,25 +13,24 @@ class OverTimeEffect : AbstractEffect
     private float totalTimeElapsed = 0;
     private bool active = false;
 
-    public OverTimeEffect(int targetClassID, int targetAttributeID, ApplyEffect effect, float val, float tickRate, float totalDuration) : base(targetClassID, targetAttributeID, effect, val)
+    public OverTimeEffect(Dictionary<string, string> data) : base(data)
     {
-        this.totalDuration = totalDuration;
-        timeLimitBeforeActivation = 1 / tickRate;
     }
 
-    public override void Activate(IAffectable target, EffectsDispatcher dipsatcher)
+    public override void Activate(AbstractStatus target, EffectsDispatcher dipsatcher)
     {
         /// do not subscribe to time based effects more then once
         if (!active)
         {
             active = true;
-            dipsatcher.AddToOvertime(this);
+            dipsatcher.AddToOvertimeList(this);
         }
 
         Tick(target, dipsatcher);
     }
 
-    private void Tick(IAffectable target, EffectsDispatcher dispatcher)
+
+    private void Tick(AbstractStatus target, EffectsDispatcher dispatcher)
     {
         totalTimeElapsed += Time.deltaTime;
         activationTimer += Time.deltaTime;
@@ -39,12 +39,12 @@ class OverTimeEffect : AbstractEffect
         {
             activationTimer = 0;
             Debug.Log("tick, elapsed time: " + totalTimeElapsed);
-            base.DoEffect(target, dispatcher);
+            base.DoEffect(target);
         }
 
         if (totalTimeElapsed >= totalDuration)
         {
-            dispatcher.RemoveFromOvertime(this);
+            dispatcher.RemoveFromOvertimeList(this);
             active = false;
         }
 

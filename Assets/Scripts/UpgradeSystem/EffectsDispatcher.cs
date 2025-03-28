@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditor.Timeline.Actions;
 using UnityEngine;
 
 /// <summary>
@@ -10,7 +12,7 @@ using UnityEngine;
 public class EffectsDispatcher : MonoBehaviour
 {
 
-    [SerializeField] IAffectable[] affectables = new IAffectable[3];
+    [SerializeField] AbstractStatus[] affectables = new AbstractStatus[3];
     [SerializeField] private ControlEventManager controlEventManager;
 
     private List<AbstractEffect> activeOvertime = new List<AbstractEffect>();
@@ -18,7 +20,7 @@ public class EffectsDispatcher : MonoBehaviour
 
     void Awake()
     {
-        FindComponentsInChildren<IAffectable>(transform);
+        FindComponentsInChildren<AbstractStatus>(transform);
     }
 
     void Update()
@@ -28,12 +30,9 @@ public class EffectsDispatcher : MonoBehaviour
         {
             Debug.Log("Dispatching upgrade");
 
-            // dispatcher doesn't care of which type of effect it is activating
-            AbstractEffect up = new OverTimeEffect(0, 4, (newValue, actualVal) => { float toreturn; toreturn = actualVal + newValue; Debug.Log("tick: increasing of" + newValue); return toreturn; }, 10, 0.5f, 10);
+            Item it = ItemManager.ComputeAnItem();
+            Debug.Log("affectables count: " + affectables.Count());
 
-            Item it = new Item();
-
-            it.effects.Add(up);
             OnItemPickUp(it);
         }
     }
@@ -55,8 +54,8 @@ public class EffectsDispatcher : MonoBehaviour
 
     /// <summary>
     /// This method is called when an item is picked up by the player
+    /// <paramref name="it"/> the item picked up
     /// </summary>
-    /// <param name="it"></param>
     public void OnItemPickUp(Item it)
     {
         foreach (AbstractEffect up in it.effects)
@@ -64,24 +63,25 @@ public class EffectsDispatcher : MonoBehaviour
             if (up.referencedAttributeClassID != null)
                 up.newValue = ResolveValue(up.referencedAttributeClassID.Value, up.referencedAttributeID.Value);
 
+            Debug.Log("Dispatching effect: " + up.targetClassID);
             up.Activate(affectables[up.targetClassID], this);
         }
     }
 
     /// <summary>
     /// Used to add an effect to the list of active over time effects
+    /// <paramref name="effect"/> the effect to add
     /// </summary>
-    /// <param name="effect"></param>
-    public void AddToOvertime(AbstractEffect effect)
+    public void AddToOvertimeList(AbstractEffect effect)
     {
         activeOvertime.Add(effect);
     }
 
     /// <summary>
     /// Used to remove an effect from the list of active over time effects
+    /// <paramref name="effect"/> the effect to remove
     /// </summary>
-    /// <param name="effect"></param>
-    public void RemoveFromOvertime(AbstractEffect effect)
+    public void RemoveFromOvertimeList(AbstractEffect effect)
     {
         readyForRemoval.Add(effect);
     }
@@ -96,10 +96,10 @@ public class EffectsDispatcher : MonoBehaviour
     }
 
     /// <summary>
-    /// if the effect has a reference to an attribute in a class , this method is called to resolve the value of the reference
+    /// If the effect has a reference to an attribute in a class, this method is called to resolve the value of the reference
+    /// <paramref name="calssID"/> the ID of the class to reference
+    /// <paramref name="attributeID"/> the ID of the attribute to reference
     /// </summary>
-    /// <param name="calssID"></param>
-    /// <param name="attributeID"></param>
     private float ResolveValue(int classID, int attributeID)
     {
         var referencedClass = affectables[classID];
@@ -107,7 +107,7 @@ public class EffectsDispatcher : MonoBehaviour
         return referencedAttributeVal;
     }
 
-    private void FindComponentsInChildren<T>(Transform parent) where T : IAffectable
+    private void FindComponentsInChildren<T>(Transform parent) where T : AbstractStatus
     {
         var components = parent.GetComponents<Component>();
 

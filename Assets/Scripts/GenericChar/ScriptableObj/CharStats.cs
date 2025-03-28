@@ -3,7 +3,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 [System.Serializable]
-public class CharStats : MonoBehaviour, IAffectable
+public class CharStats : AbstractStatus
 {
     public int ID => 0;
 
@@ -27,73 +27,7 @@ public class CharStats : MonoBehaviour, IAffectable
 
     private Action<float>[] updatabales;
 
-    void Start()
-    {
-        updatabales = new Action<float>[]{
-        (newVal) => { rotationSpeed =    newVal; },
-        (newVal) => { life =             newVal; },
-        (newVal) => { aimRotationSpeed = newVal; },
-        (newVal) => { jumpSpeed =        newVal; },
-        (newVal) => { moveSpeed =        newVal; },
-        (newVal) => { jumpSpeed =        newVal; },
-        (newVal) => { maxJumps =   (int) newVal; },
-        (newVal) => { speedLimitBeforeRagdolling = newVal; }
-    };
-
-    }
-    public void SetStatByID(int targetAttribute, float upgrade)
-    {
-        updatabales[targetAttribute](upgrade);
-    }
-
-    public float GetStatByID(int id)
-    {
-        float ret;
-        switch ((UpgradeType)id)
-        {
-            case UpgradeType.RotationSpeed:
-                ret = rotationSpeed;
-                break;
-            case UpgradeType.Life:
-                ret = life;
-                break;
-            case UpgradeType.AimRotationSpeed:
-                ret = aimRotationSpeed;
-                break;
-            case UpgradeType.JumpSpeed:
-                ret = jumpSpeed;
-                break;
-            case UpgradeType.MoveSpeed:
-                ret = moveSpeed;
-                break;
-            case UpgradeType.AnotherJumpSpeed:
-                ret = jumpSpeed;
-                break;
-            case UpgradeType.MaxJumps:
-                ret = maxJumps;
-                break;
-            case UpgradeType.SpeedLimitBeforeRagdolling:
-                ret = speedLimitBeforeRagdolling;
-                break;
-            default:
-                ret = 0;
-                break;
-        }
-        return ret;
-    }
 
 
 
-    private enum UpgradeType
-    {
-        RotationSpeed = 0,
-        Life = 1,
-        AimRotationSpeed = 2,
-        JumpSpeed = 3,
-        MoveSpeed = 4,
-        AnotherJumpSpeed = 5,
-        MaxJumps = 6,
-        SpeedLimitBeforeRagdolling
-
-    }
 }
