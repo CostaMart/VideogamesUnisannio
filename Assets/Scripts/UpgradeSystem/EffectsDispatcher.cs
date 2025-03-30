@@ -58,12 +58,13 @@ public class EffectsDispatcher : MonoBehaviour
     /// </summary>
     public void OnItemPickUp(Item it)
     {
+        Debug.Log("picked up: " + it.ToString());
+
         foreach (AbstractEffect up in it.effects)
         {
             if (up.referencedAttributeClassID != null)
                 up.newValue = ResolveValue(up.referencedAttributeClassID.Value, up.referencedAttributeID.Value);
 
-            Debug.Log("Dispatching effect: " + up.targetClassID);
             up.Activate(affectables[up.targetClassID], this);
         }
     }

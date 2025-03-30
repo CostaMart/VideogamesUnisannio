@@ -13,8 +13,11 @@ public class ItemManager
     public int id;
     public List<AbstractEffect> effects;
 
+    public static Dictionary<int, Item> globalItemPool = new Dictionary<int, Item>(); /// this contains all the items created by the game from the JSON file
     public static Item ComputeAnItem()
     {
+
+        Debug.Log("ComputeAnItem called");
 
         // Leggi il JSON dal file
         string text = File.ReadAllText("/home/costamh/HeroDivers/ItemList.json");
@@ -26,26 +29,54 @@ public class ItemManager
         // ma i parametri sono presi dinamicaente dal file JSON
         // Accesso ai dati
         Item i = null;
-        foreach (var item in data.items)  // Accedi alla lista di effetti
-        {
-            i = new Item();
-            i.effects = new List<AbstractEffect>();
 
-            foreach (var effect in item.effects)
+        foreach (var item in data.items)  // per ogni item json
+        {
+            i = new Item
+            {
+                effects = new List<AbstractEffect>()
+            };
+
+            i.name = item.name;
+            i.id = item.id;
+            int effectID = 0;
+
+            foreach (var effect in item.effects) // per ogni effetto nella lista
             {
                 var type = effect["effectType"].ToString();
                 AbstractEffect e = null;
                 switch (type)
                 {
-                    case "ot":
-                        e = new SingleActivationEffect(effect);
+                    case "sa":
+                        e = new SingleActivationEffect(effect, item.id, effectID);
                         break;
+
+                    case "ot":
+                        e = new OverTimeEffect(effect, item.id, effectID);
+                        break;
+
+                    default:
+                        throw new Exception("Effect type '" + type + "' not recognized");
                 }
 
                 i.effects.Add(e);
+                effectID++;
             }
 
+            Debug.Log("item created: " + item.name);
+            Debug.Log("item id: " + item.id);
+
+            if (globalItemPool.ContainsKey(i.id))
+            {
+                throw new Exception("Item with ID " + i.id + " already exists in the global pool. Skipping creation.");
+            }
+            else
+            {
+                globalItemPool.Add(i.id, i);
+            }
         }
+
+
 
         return i;
     }
@@ -54,9 +85,12 @@ public class ItemManager
     {
         public List<ItemIncomplete> items;
     }
+
     private class ItemIncomplete
     {
         public int id;
+
+        public string name;
         public List<Dictionary<string, string>> effects;
     }
 }
@@ -64,5 +98,17 @@ public class ItemManager
 
 public class Item
 {
+    public string name;
+    public int id;
     public List<AbstractEffect> effects;
+
+    public override string ToString()
+    {
+        string s = "Item: \n";
+        foreach (var effect in effects)
+        {
+            s += effect.ToString() + "\n";
+        }
+        return s;
+    }
 }

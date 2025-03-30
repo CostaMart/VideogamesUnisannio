@@ -52,10 +52,9 @@ public abstract class AbstractEffect
     /// </summary>
     private ApplyEffect Apply { get; set; }
 
-    public AbstractEffect(Dictionary<string, string> data)
+    public AbstractEffect(Dictionary<string, string> data, int itemID)
     {
         this.targetClassID = int.Parse(data["targetClass"]);
-        Debug.Log("targetClassID: " + targetClassID);
         this.targetAttributeID = int.Parse(data["targetStat"]);
 
         if (data.ContainsKey("referencedAttributeClassID"))
@@ -65,8 +64,10 @@ public abstract class AbstractEffect
             this.referencedAttributeID = int.Parse(data["referencedAttributeID"]);
 
         if (data.ContainsKey("effectValue"))
-            this.newValue = float.Parse(data["effectValue"]);
+            this.newValue = float.Parse(data["effectValue"], System.Globalization.CultureInfo.InvariantCulture);
 
+
+        // where actual value is the current value of the attribute, newval is the one to be applied by the effect
         if (data.ContainsKey("effectOperand"))
             switch ((string)data["effectOperand"])
             {
@@ -77,10 +78,10 @@ public abstract class AbstractEffect
                     Apply = (newVal, actualVal) => newVal * actualVal;
                     break;
                 case "divide":
-                    Apply = (newVal, actualVal) => newVal / actualVal;
+                    Apply = (newVal, actualVal) => actualVal / newVal;
                     break;
-                case "subtract":
-                    Apply = (newVal, actualVal) => newVal - actualVal;
+                case "sub":
+                    Apply = (newVal, actualVal) => actualVal - newVal;
                     break;
                 case "set":
                     Apply = (newVal, actualVal) => newVal;
