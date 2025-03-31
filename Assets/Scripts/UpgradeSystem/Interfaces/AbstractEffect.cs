@@ -1,5 +1,7 @@
+using NCalc;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 /// <summary>
@@ -7,9 +9,22 @@ using UnityEngine;
 /// </summary>
 public abstract class AbstractEffect
 {
+    public int ID;
     public delegate float ApplyEffect(float newVal, float actualVal);
 
     public int name { get; private set; }
+
+    public Expression ex;
+
+    /// <summary>
+    /// This is the list of parameters translated into index from the 'expr' string of the json effect
+    /// </summary>
+    public int[][] parametersRef;
+
+    /// <summary>
+    /// This array the value of the parameters in parametersRef, it is updated at each DoEffect call
+    /// </summary>
+    public float[] resolvedVals;
 
     /// <summary>
     /// ID of the class to be affected
@@ -21,92 +36,71 @@ public abstract class AbstractEffect
     /// </summary>
     public int targetAttributeID { get; private set; }
 
-    /// <summary>
-    /// by setting this parameter to a not null value different, you can request the dispatcher to resolve the value.
-    /// This parameter becomes the index of the class you want to get the value from.
-    /// </summary>
-    public int? referencedAttributeClassID { get; private set; }
 
     /// <summary>
-    /// By setting referencedAttributeClass to a not null value , you can specify this value which attribute 
-    /// of the class you want to use as parameter.
+    /// This constructor inits the effect expression with data from json file. it transaltes the expression parameters into IDs
+    /// This constructer is only called at game start when ItemManager reads the JSON file. The expression is compiled only once and stored in the ex variable.
     /// </summary>
-    public int? referencedAttributeID { get; private set; }
-
-    /// <summary>
-    /// Value used to compute the final value of the effect. It can be processed into Apply and then applied into ActivateEffect 
-    /// </summary>
-    public float newValue { get; set; }
-
-    /// <summary>
-    /// The value returned by this function can be applied to the stat target value.
-    /// This function can be passed from exteranl sources to change the value computation.
-    /// For example you may want to sum something to the referencedValue to generate the newValue,
-    /// or you want to multiply it, you can just change what this function outputs in a "strategy pattern" fashion.
-    /// 
-    /// IMPORTANT:
-    /// The first parameter is the new value to be applied to the target attribute.
-    /// The second parameter is the actual value of the target attribute.
-    /// this is what the programmer whose implementing the effect expect to compute the value, so don't do anything fancy here.
-    /// 
-    /// </summary>
-    private ApplyEffect Apply { get; set; }
-
+    /// <param name="data"></param>
+    /// <param name="itemID"></param>
     public AbstractEffect(Dictionary<string, string> data, int itemID)
     {
-        this.targetClassID = int.Parse(data["targetClass"]);
-        this.targetAttributeID = int.Parse(data["targetStat"]);
 
-        if (data.ContainsKey("referencedAttributeClassID"))
-            this.referencedAttributeClassID = int.Parse(data["referencedAttributeClassID"]);
-
-        if (data.ContainsKey("referencedAttributeID"))
-            this.referencedAttributeID = int.Parse(data["referencedAttributeID"]);
-
-        if (data.ContainsKey("effectValue"))
-            this.newValue = float.Parse(data["effectValue"], System.Globalization.CultureInfo.InvariantCulture);
+        string targetClassString = data["target"];
+        string s = data["expr"];
 
 
-        // where actual value is the current value of the attribute, newval is the one to be applied by the effect
-        if (data.ContainsKey("effectOperand"))
-            switch ((string)data["effectOperand"])
-            {
-                case "add":
-                    Apply = (newVal, actualVal) => newVal + actualVal;
-                    break;
-                case "multiply":
-                    Apply = (newVal, actualVal) => newVal * actualVal;
-                    break;
-                case "divide":
-                    Apply = (newVal, actualVal) => actualVal / newVal;
-                    break;
-                case "sub":
-                    Apply = (newVal, actualVal) => actualVal - newVal;
-                    break;
-                case "set":
-                    Apply = (newVal, actualVal) => newVal;
-                    break;
-                default:
-                    Apply = (newVal, actualVal) => newVal;
-                    break;
-            }
+        MatchCollection matches = Regex.Matches(data["expr"], @"@\w+\.\d+");
+        targetClassID = ItemManager.statClassToIdRegistry[targetClassString.Split(".")[0]];
+        targetAttributeID = int.Parse(targetClassString.Split(".")[1]);
+
+
+        char c = 'A';
+        int len = matches.Count;
+        parametersRef = new int[len][];
+        int i = 0;
+
+        // cerchiamo nella stringa tutti i riferimenti a variabili di altre classi, nel caso se ne trovino vengono sostituite con un ID alfabetico nella stringa dell'espression
+        // contemporaneamente il nome viene tradotto in ID numerico e inserito nell'array dei riferimenti da risolvere. I valori vengono risolti 
+        // ad ogni invocazione di DoEffect in modo che siano sempre aggiornati
+        foreach (var match in matches)
+        {
+            s = s.Replace(match.ToString(), c.ToString());
+            string laClass = match.ToString().Split('.')[0].Substring(1);
+            int laAttribute = int.Parse(match.ToString().Split('.')[1]);
+
+            parametersRef[i] = new int[2];
+            parametersRef[i][0] = ItemManager.statClassToIdRegistry[laClass];
+            parametersRef[i][1] = laAttribute;
+
+            c += (char)1;
+            i++;
+        }
+
+        ex = new Expression(s);
     }
 
     /// <summary>
-    /// This method applies a new value to the IAffecatble feature. 
-    /// Following application logic defined by this method, such as applying this effect 
-    /// in response to an event or appling it only once.
+    /// This method applies the effect to the target. It resolves the parameters and applies the expression to compute the new value for the target attribute.
     /// </summary>
-    /// 
     /// <param name="target">The target of the item effect.</param>
     /// <param name="dispatcher">
     /// Provides access to other game system elements, such as event dispatchers. 
     /// Use this to implement custom behaviors.
     /// </param>
-    protected void DoEffect(AbstractStatus target)
+    protected void DoEffect(AbstractStatus target, EffectsDispatcher dispatcher)
     {
-        var val = Apply(newValue, target.GetStatByID(targetAttributeID));
-        target.SetStatByID(targetAttributeID, val);
+        resolvedVals = dispatcher.ResolveValue(parametersRef);
+
+        char c = 'A';
+        foreach (var value in resolvedVals)
+        {
+            ex.Parameters[c.ToString()] = value;
+            c += (char)1;
+        }
+
+        float result = Convert.ToSingle(ex.Evaluate());
+        target.SetStatByID(targetAttributeID, result);
     }
 
     /// <summary>
@@ -114,11 +108,8 @@ public abstract class AbstractEffect
     /// to apply the effect call <see cref="DoEffect"/> method.
     /// <paramref name="dispatcher"/> is used to access other game systems.
     /// <paramref name="target"/> is the target of the effect.
-    /// 
     /// </summary>
-    /// 
     /// TODO: potrei voler levare target come parametro per impedire a chi scrive gli effetti di fare cose strane
     public abstract void Activate(AbstractStatus target, EffectsDispatcher dispatcher);
-
 
 }

@@ -49,7 +49,7 @@ class OverTimeEffect : AbstractEffect
         if (activationTimer >= timeLimitBeforeActivation)
         {
             activationTimer = 0;
-            base.DoEffect(target);
+            base.DoEffect(target, dispatcher);
         }
 
         if (totalTimeElapsed >= totalDuration)
@@ -61,8 +61,4 @@ class OverTimeEffect : AbstractEffect
 
     }
 
-    public override string ToString()
-    {
-        return "OverTimeEffect: " + targetClassID + " " + targetAttributeID + " " + newValue + " " + totalDuration;
-    }
 }

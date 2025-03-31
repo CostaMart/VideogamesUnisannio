@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -11,13 +10,19 @@ public abstract class AbstractStatus : MonoBehaviour
 {
     public FieldInfo[] fields;
 
+    public AbstractStatus()
+    {
+        ID = ItemManager.statClassToIdRegistry[this.GetType().Name];
+    }
+
     /// <summary>
     /// ID of this affectable type 
     /// </summary>
-    public int ID { get; }
+    public int ID { get; private set; }
 
     void Awake()
     {
+        new ItemManager();
         Type type = this.GetType();
         Debug.Log("Type: " + type);
         fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
@@ -41,6 +46,14 @@ public abstract class AbstractStatus : MonoBehaviour
     /// </summary>
     public float GetStatByID(int id)
     {
-        return (float)fields[id].GetValue(this);
+        if (id < fields.Length)
+        {
+            return (float)fields[id].GetValue(this);
+        }
+        else
+        {
+            Debug.LogError("attribute ID" + id + " out of range for class" + this.GetType().Name + ", requested value will be resolved with 0");
+            return 0f;
+        }
     }
 }

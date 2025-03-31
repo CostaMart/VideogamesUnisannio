@@ -11,7 +11,8 @@ public class SingleActivationEffect : AbstractEffect
   public SingleActivationEffect(Dictionary<string, string> data, int itemID, int effectID) : base(data, itemID) { }
   public override void Activate(AbstractStatus target, EffectsDispatcher dispatcher)
   {
-    base.DoEffect(target);
+
+    base.DoEffect(target, dispatcher);
   }
 
 }

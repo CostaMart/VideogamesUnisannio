@@ -1,11 +1,9 @@
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [System.Serializable]
 public class CharStats : AbstractStatus
 {
-    public int ID => 0;
 
     private delegate float Command(float op1, float op2);
     [SerializeField] private float rotationSpeed = 0.5f;

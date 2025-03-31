@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.Timeline.Actions;
 using UnityEngine;
+using static ItemManager;
 
 /// <summary>
 /// This component is responsible for dispatching the effects to the correct classes, and serves as a
@@ -12,7 +13,7 @@ using UnityEngine;
 public class EffectsDispatcher : MonoBehaviour
 {
 
-    [SerializeField] AbstractStatus[] affectables = new AbstractStatus[3];
+    [SerializeField] Dictionary<int, AbstractStatus> affectables = new Dictionary<int, AbstractStatus>();
     [SerializeField] private ControlEventManager controlEventManager;
 
     private List<AbstractEffect> activeOvertime = new List<AbstractEffect>();
@@ -25,7 +26,7 @@ public class EffectsDispatcher : MonoBehaviour
 
     void Update()
     {
-        // PROTO: solo per prototipazione, verranno eliminati 
+        // TODO: solo per prototipazione, verranno eliminati 
         if (Input.GetKeyDown(KeyCode.E))
         {
             Debug.Log("Dispatching upgrade");
@@ -33,7 +34,7 @@ public class EffectsDispatcher : MonoBehaviour
             Item it = ItemManager.ComputeAnItem();
             Debug.Log("affectables count: " + affectables.Count());
 
-            OnItemPickUp(it);
+            ItemDispatch(it);
         }
     }
 
@@ -56,15 +57,10 @@ public class EffectsDispatcher : MonoBehaviour
     /// This method is called when an item is picked up by the player
     /// <paramref name="it"/> the item picked up
     /// </summary>
-    public void OnItemPickUp(Item it)
+    public void ItemDispatch(Item it)
     {
-        Debug.Log("picked up: " + it.ToString());
-
         foreach (AbstractEffect up in it.effects)
         {
-            if (up.referencedAttributeClassID != null)
-                up.newValue = ResolveValue(up.referencedAttributeClassID.Value, up.referencedAttributeID.Value);
-
             up.Activate(affectables[up.targetClassID], this);
         }
     }
@@ -97,17 +93,37 @@ public class EffectsDispatcher : MonoBehaviour
     }
 
     /// <summary>
-    /// If the effect has a reference to an attribute in a class, this method is called to resolve the value of the reference
+    /// If a member of effect class has a reference to an attribute in a status class, this method is called to resolve the current value of such reference
     /// <paramref name="calssID"/> the ID of the class to reference
     /// <paramref name="attributeID"/> the ID of the attribute to reference
     /// </summary>
-    private float ResolveValue(int classID, int attributeID)
+    public float[] ResolveValue(int[][] references)
     {
-        var referencedClass = affectables[classID];
-        float referencedAttributeVal = referencedClass.GetStatByID(attributeID);
-        return referencedAttributeVal;
+        float[] toret = new float[references.Length];
+        int x = 0;
+
+
+        foreach (var refere in references)
+        {
+            var referencedClass = affectables[refere[0]];
+
+            Debug.Log("referenced class ID: " + refere[0]);
+            Debug.Log("referenced class: " + referencedClass.GetType().Name);
+
+            float referencedAttributeVal = referencedClass.GetStatByID(refere[1]);
+            toret[x] = referencedAttributeVal;
+            x++;
+        }
+
+        return toret;
     }
 
+
+    /// <summary>
+    /// search for all the components of type T in the hierarchy of the parent transform
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="parent"></param>
     private void FindComponentsInChildren<T>(Transform parent) where T : AbstractStatus
     {
         var components = parent.GetComponents<Component>();
@@ -116,8 +132,7 @@ public class EffectsDispatcher : MonoBehaviour
         {
             if (component is T upgradable)
             {
-                Debug.Log("Found IUpgradable component: " + component.GetType().Name);
-                affectables[upgradable.ID] = upgradable;
+                affectables.Add(upgradable.ID, upgradable);
             }
         }
 
@@ -125,6 +140,7 @@ public class EffectsDispatcher : MonoBehaviour
         {
             FindComponentsInChildren<T>(child);  // Chiamata ricorsiva per ogni figlio
         }
+
     }
 
 }

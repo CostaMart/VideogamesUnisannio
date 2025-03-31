@@ -6,41 +6,17 @@
             "effects": [
                 {
                     "effectType": "sa",
-                    "targetClass": 0,
-                    "targetStat": 4,
-                    "effectOperand": "add",
-                    "effectValue": "100"
+                    "target": "CharStats.4",
+                    "expr": "@CharStats.4 + 20",
+                    "totalduration": 10,
+                    "rate": 2
                 },
-                {
-                    "effectType": "ot",
-                    "targetClass": 0,
-                    "targetStat": 3,
-                    "totalDuration": 10,
-                    "effectOperand": "sub",
-                    "effectValue": 0.5,
-                    "rate": 1
-                }
-            ]
-        },
-        {
-            "id": 2,
-            "name": "item 2",
-            "effects": [
                 {
                     "effectType": "sa",
-                    "targetClass": 0,
-                    "targetStat": 4,
-                    "effectOperand": "add",
-                    "effectValue": "100"
-                },
-                {
-                    "effectType": "ot",
-                    "targetClass": 0,
-                    "targetStat": 3,
-                    "totalDuration": 10,
-                    "effectOperand": "sub",
-                    "effectValue": 0.5,
-                    "rate": 1
+                    "target": "CharStats.4",
+                    "expr": "@CharStats.4 + 20",
+                    "totalduration": 10,
+                    "rate": 2
                 }
             ]
         }

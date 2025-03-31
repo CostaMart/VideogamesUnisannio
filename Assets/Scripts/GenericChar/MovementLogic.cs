@@ -1,6 +1,5 @@
 
 using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
