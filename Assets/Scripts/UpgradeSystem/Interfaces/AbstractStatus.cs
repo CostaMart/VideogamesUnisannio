@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
@@ -10,6 +11,10 @@ public abstract class AbstractStatus : MonoBehaviour
 {
     private FieldInfo[] fields;
 
+    private List<AbstractEffect> activeEffects = new List<AbstractEffect>();
+
+    private List<AbstractEffect> effectsToRemove = new List<AbstractEffect>();
+
     /// <summary>
     /// ID of this affectable type 
     /// </summary>
@@ -20,12 +25,24 @@ public abstract class AbstractStatus : MonoBehaviour
         ID = ItemManager.statClassToIdRegistry[this.GetType().Name];
     }
 
+    void Update()
+    {
+        this.ActivateEffects();
+
+        foreach (var ef in effectsToRemove)
+        {
+            activeEffects.Remove(ef);
+        }
+
+        effectsToRemove.Clear();
+    }
+
     void Awake()
     {
         new ItemManager();
         Type type = this.GetType();
         Debug.Log("Type: " + type);
-        fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
+        fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         Debug.Log("Stat Fields found: " + fields.Length);
     }
 
@@ -53,6 +70,39 @@ public abstract class AbstractStatus : MonoBehaviour
         {
             Debug.LogError("attribute ID" + id + " out of range for class" + this.GetType().Name + ", requested value will be resolved with 0");
             return 0f;
+        }
+    }
+
+    /// <summary>
+    /// Attach an effect to this status class.
+    /// </summary>
+    /// <param name="effect"></param>
+    public void AttachEffect(AbstractEffect effect)
+    {
+        this.activeEffects.Add(effect);
+    }
+
+    /// <summary>
+    /// Remove an effect from this status class.
+    /// </summary>
+    /// <param name="effect"></param>
+    public void RemoveEffect(AbstractEffect effect)
+    {
+        this.effectsToRemove.Add(effect);
+    }
+
+    /// <summary>
+    /// Activate effect in the effect list
+    /// </summary>
+    protected void ActivateEffects()
+    {
+        foreach (var ef in activeEffects)
+        {
+            float? toApply = ef.Activate(this);
+            if (toApply != null)
+            {
+                this.SetStatByID(ef.targetAttributeID, toApply.Value);
+            }
         }
     }
 }

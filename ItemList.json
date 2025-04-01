@@ -5,9 +5,11 @@
             "name": "item 1",
             "effects": [
                 {
-                    "effectType": "sa",
+                    "effectType": "ot",
                     "target": "CharStats.4",
-                    "expr": "@CharStats.4 + 20"
+                    "expr": "@CharStats.4 + 1",
+                    "totalDuration": 10,
+                    "rate": 1
                 }
             ]
         },

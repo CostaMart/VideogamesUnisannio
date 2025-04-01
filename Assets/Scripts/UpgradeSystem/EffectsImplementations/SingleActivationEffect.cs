@@ -9,10 +9,11 @@ public class SingleActivationEffect : AbstractEffect
 {
 
   public SingleActivationEffect(Dictionary<string, string> data, int itemID, int effectID) : base(data, itemID) { }
-  public override void Activate(AbstractStatus target, EffectsDispatcher dispatcher)
+  public override float? Activate(AbstractStatus target)
   {
-
-    base.DoEffect(target, dispatcher);
+    var result = base.DoEffect();
+    target.RemoveEffect(this);
+    return result;
   }
 
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 public class ItemMono : MonoBehaviour
 {
 
-    public ItemManager.Item item = ItemManager.globalItemPool[1];
+    public ItemManager.Item item = ItemManager.globalItemPool[0];
 
     void OnCollisionStay(Collision collision)
     {

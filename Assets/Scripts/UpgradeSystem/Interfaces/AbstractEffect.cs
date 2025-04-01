@@ -2,6 +2,7 @@ using NCalc;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 /// <summary>
@@ -10,11 +11,16 @@ using UnityEngine;
 public abstract class AbstractEffect
 {
     public int ID;
-    public delegate float ApplyEffect(float newVal, float actualVal);
+
+    private EffectsDispatcher dispatcher;
 
     public int name { get; private set; }
 
-    public Expression ex;
+    /// <summary>
+    /// expression to compute new vals from this effect.
+    /// It is already in its compiled form, so it is not necessary to compile it again.
+    /// </summary>
+    private Expression ex;
 
     /// <summary>
     /// This is the list of parameters translated into index from the 'expr' string of the json effect
@@ -88,7 +94,7 @@ public abstract class AbstractEffect
     /// Provides access to other game system elements, such as event dispatchers. 
     /// Use this to implement custom behaviors.
     /// </param>
-    protected void DoEffect(AbstractStatus target, EffectsDispatcher dispatcher)
+    protected float DoEffect()
     {
         resolvedVals = dispatcher.ResolveValue(parametersRef);
 
@@ -99,8 +105,19 @@ public abstract class AbstractEffect
             c += (char)1;
         }
 
-        float result = Convert.ToSingle(ex.Evaluate());
-        target.SetStatByID(targetAttributeID, result);
+        return Convert.ToSingle(ex.Evaluate());
+    }
+
+    /// <summary>
+    /// attach this effect to the target status class. 
+    /// and to the dispatcher.
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="dispatcher"></param>
+    public void Attach(AbstractStatus target, EffectsDispatcher dispatcher)
+    {
+        this.dispatcher = dispatcher;
+        target.AttachEffect(this);
     }
 
     /// <summary>
@@ -110,6 +127,6 @@ public abstract class AbstractEffect
     /// <paramref name="target"/> is the target of the effect.
     /// </summary>
     /// TODO: potrei voler levare target come parametro per impedire a chi scrive gli effetti di fare cose strane
-    public abstract void Activate(AbstractStatus target, EffectsDispatcher dispatcher);
+    public abstract float? Activate(AbstractStatus target);
 
 }

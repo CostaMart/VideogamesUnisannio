@@ -11,7 +11,6 @@ class OverTimeEffect : AbstractEffect
     private float timeLimitBeforeActivation;
     private float activationTimer = 0;
     private float totalTimeElapsed = 0;
-    private bool active = false;
 
     public OverTimeEffect(Dictionary<string, string> data, int itemID, int effectID) : base(data, itemID)
 
@@ -28,37 +27,30 @@ class OverTimeEffect : AbstractEffect
         timeLimitBeforeActivation = 1 / actRate;
     }
 
-    public override void Activate(AbstractStatus target, EffectsDispatcher dipsatcher)
+    public override float? Activate(AbstractStatus target)
     {
-        /// do not subscribe to time based effects more then once
-        if (!active)
-        {
-            active = true;
-            dipsatcher.AddToOvertimeList(this);
-        }
-
-        Tick(target, dipsatcher);
+        return Tick(target);
     }
 
 
-    private void Tick(AbstractStatus target, EffectsDispatcher dispatcher)
+    private float? Tick(AbstractStatus target)
     {
         totalTimeElapsed += Time.deltaTime;
         activationTimer += Time.deltaTime;
+        float? result = null;
 
         if (activationTimer >= timeLimitBeforeActivation)
         {
             activationTimer = 0;
-            base.DoEffect(target, dispatcher);
+            result = base.DoEffect();
         }
 
         if (totalTimeElapsed >= totalDuration)
         {
-            dispatcher.RemoveFromOvertimeList(this);
-            active = false;
+            target.RemoveEffect(this);
         }
 
-
+        return result;
     }
 
 }

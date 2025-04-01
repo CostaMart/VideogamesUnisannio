@@ -16,8 +16,6 @@ public class EffectsDispatcher : MonoBehaviour
     [SerializeField] Dictionary<int, AbstractStatus> affectables = new Dictionary<int, AbstractStatus>();
     [SerializeField] private ControlEventManager controlEventManager;
 
-    private List<AbstractEffect> activeOvertime = new List<AbstractEffect>();
-    private List<AbstractEffect> readyForRemoval = new List<AbstractEffect>();
 
     void OnCollisionEnter(Collision collision)
     {
@@ -36,21 +34,6 @@ public class EffectsDispatcher : MonoBehaviour
 
 
     /// <summary>
-    /// EffectsDispatcher assures that the effects in activeOverTime are activated in the correct order and at fixed intervals 
-    /// </summary>
-    void FixedUpdate()
-
-    {
-        // activate over time effects
-        foreach (var effect in activeOvertime)
-        {
-            effect.Activate(affectables[effect.targetClassID], this);
-        }
-
-        CleanEffects();
-    }
-
-    /// <summary>
     /// This method is called when an item is picked up by the player
     /// <paramref name="it"/> the item picked up
     /// </summary>
@@ -58,36 +41,10 @@ public class EffectsDispatcher : MonoBehaviour
     {
         foreach (AbstractEffect up in it.effects)
         {
-            up.Activate(affectables[up.targetClassID], this);
+            up.Attach(affectables[up.targetClassID], this);
         }
     }
 
-    /// <summary>
-    /// Used to add an effect to the list of active over time effects
-    /// <paramref name="effect"/> the effect to add
-    /// </summary>
-    public void AddToOvertimeList(AbstractEffect effect)
-    {
-        activeOvertime.Add(effect);
-    }
-
-    /// <summary>
-    /// Used to remove an effect from the list of active over time effects
-    /// <paramref name="effect"/> the effect to remove
-    /// </summary>
-    public void RemoveFromOvertimeList(AbstractEffect effect)
-    {
-        readyForRemoval.Add(effect);
-    }
-
-    /// <summary>
-    /// Used internally to remove effects from the list safely
-    /// </summary>
-    private void CleanEffects()
-    {
-        activeOvertime.RemoveAll((effect) => readyForRemoval.Contains(effect));
-        readyForRemoval.Clear();
-    }
 
     /// <summary>
     /// If a member of effect class has a reference to an attribute in a status class, this method is called to resolve the current value of such reference
