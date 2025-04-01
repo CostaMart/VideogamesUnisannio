@@ -1,18 +1,21 @@
+using TMPro;
 using UnityEngine;
 
 public class WeaponState : AbstractStatus
 {
 
-    [SerializeField] private int baseMagSize;
+    [SerializeField] private float baseMagSize;
 
     [SerializeField] private float baseFireRate;
 
-    public int magSize;
+    [SerializeField] private bool isPrimary = true; // 0 = primary, 1 = secondary
+
+    public float magSize;
     public float fireRate;
 
-    public int MagSize => magSize;
 
     public float FireRate => fireRate;
+
 
 
     void Start()
@@ -24,6 +27,17 @@ public class WeaponState : AbstractStatus
     // Update is called once per frame
     void Update()
     {
+        base.Update();
+    }
 
+    protected override int ComputeID()
+    {
+        if (isPrimary)
+            return ItemManager.statClassToIdRegistry["PrimaryWeaponState"];
+        else
+        {
+            Debug.Log("Secondary weapon state");
+            return ItemManager.statClassToIdRegistry["SecondaryWeaponState"];
+        }
     }
 }

@@ -25,7 +25,8 @@ public class CharStats : AbstractStatus
 
     private Action<float>[] updatabales;
 
-
-
-
+    protected override int ComputeID()
+    {
+        return ItemManager.statClassToIdRegistry[this.GetType().Name];
+    }
 }

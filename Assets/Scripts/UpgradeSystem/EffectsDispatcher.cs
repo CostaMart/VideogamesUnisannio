@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.Timeline.Actions;
@@ -30,6 +31,11 @@ public class EffectsDispatcher : MonoBehaviour
         new ItemManager();
         FindComponentsInChildren<AbstractStatus>(transform);
 
+        foreach (var aff in affectables)
+        {
+            Debug.Log("Affectable class found: " + aff.Value.GetType().Name);
+        }
+
     }
 
 
@@ -59,14 +65,24 @@ public class EffectsDispatcher : MonoBehaviour
 
         foreach (var refere in references)
         {
-            var referencedClass = affectables[refere[0]];
+            try
+            {
+                var referencedClass = affectables[refere[0]];
+                float referencedAttributeVal = referencedClass.GetStatByID(refere[1]);
+                toret[x] = referencedAttributeVal;
+                x++;
+            }
+            catch (KeyNotFoundException e)
+            {
+                Debug.LogError("Class ID " + refere[0] + " not found in the dispatcher");
+                toret[x] = 0f;
+                x++;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error in resolving value: " + e.Message);
+            }
 
-            Debug.Log("referenced class ID: " + refere[0]);
-            Debug.Log("referenced class: " + referencedClass.GetType().Name);
-
-            float referencedAttributeVal = referencedClass.GetStatByID(refere[1]);
-            toret[x] = referencedAttributeVal;
-            x++;
         }
 
         return toret;
@@ -86,7 +102,21 @@ public class EffectsDispatcher : MonoBehaviour
         {
             if (component is T upgradable)
             {
-                affectables.Add(upgradable.ID, upgradable);
+                try
+                {
+                    affectables.Add(upgradable.ID, upgradable);
+                }
+                catch (ArgumentException e)
+                {
+                    if (upgradable.GetType().Name == "WeaponState")
+                    {
+                        Debug.LogError("This character has two Weapon of the same type (primary or secondary), please check gameobject: " + transform.gameObject.name);
+                    }
+                    else
+                    {
+                        Debug.LogError(e.Message);
+                    }
+                }
             }
         }
 
@@ -94,7 +124,7 @@ public class EffectsDispatcher : MonoBehaviour
         {
             FindComponentsInChildren<T>(child);  // Chiamata ricorsiva per ogni figlio
         }
-
     }
 
 }
+

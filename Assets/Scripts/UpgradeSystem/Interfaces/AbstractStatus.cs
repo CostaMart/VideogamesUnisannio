@@ -20,12 +20,9 @@ public abstract class AbstractStatus : MonoBehaviour
     /// </summary>
     public int ID { get; private set; }
 
-    public AbstractStatus()
-    {
-        ID = ItemManager.statClassToIdRegistry[this.GetType().Name];
-    }
+    protected abstract int ComputeID();
 
-    void Update()
+    protected void Update()
     {
         this.ActivateEffects();
 
@@ -39,6 +36,7 @@ public abstract class AbstractStatus : MonoBehaviour
 
     void Awake()
     {
+        ID = ComputeID();
         new ItemManager();
         Type type = this.GetType();
         Debug.Log("Type: " + type);
@@ -68,8 +66,7 @@ public abstract class AbstractStatus : MonoBehaviour
         }
         else
         {
-            Debug.LogError("attribute ID" + id + " out of range for class" + this.GetType().Name + ", requested value will be resolved with 0");
-            return 0f;
+            throw new Exception("Unable to resolve attribute ID " + id + " for status calss " + this.GetType().Name);
         }
     }
 

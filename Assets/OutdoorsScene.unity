@@ -358,7 +358,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &18548419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -418,11 +418,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 300648d91b0b8d476997c685b120d12e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 0.5
+  rotationSpeed: 20
   life: 100
-  aimRotationSpeed: 5
+  aimRotationSpeed: 20
   jumpSpeed: 5
-  moveSpeed: 5
+  moveSpeed: 15
   speedLimitBeforeRagdolling: 60
   maxJumps: 1
 --- !u!114 &18548423
@@ -918,13 +918,14 @@ GameObject:
   - component: {fileID: 234436415}
   - component: {fileID: 234436414}
   - component: {fileID: 234436416}
+  - component: {fileID: 234436417}
   m_Layer: 0
   m_Name: AssaultRifle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &234436413
 Transform:
   m_ObjectHideFlags: 0
@@ -1006,16 +1007,31 @@ MonoBehaviour:
   m_GameObject: {fileID: 234436412}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 122d16a3f84d1e207a22b0d005b9d06e, type: 3}
+  m_Script: {fileID: 11500000, guid: 0c220e8859b97dcfd965bb1b634a6ab0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletPrefab: {fileID: 6093212292097676079, guid: f351ee1e5215b4e78b2bede5f2d5c8a2, type: 3}
-  pool: {fileID: 780216143}
-  anim: {fileID: 18548409}
-  muzzle: {fileID: 1981075844}
-  magCount: 10
-  weaponStat: {fileID: 0}
-  controlEventManager: {fileID: 11400000, guid: a8c9cf2bc434199ecac824c6d78347ba, type: 2}
+  baseMagSize: 0
+  baseFireRate: 0
+  secondaryOrPrimary: 0
+  magSize: 0
+  fireRate: 0
+--- !u!114 &234436417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 234436412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c220e8859b97dcfd965bb1b634a6ab0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseMagSize: 0
+  baseFireRate: 0
+  secondaryOrPrimary: 2
+  magSize: 0
+  fireRate: 0
 --- !u!4 &246219162 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2836004475591197033, guid: f432554f564e69242897607d34218939, type: 3}
@@ -2284,7 +2300,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b5826c3ec2ce08e7af55a4430d5b8e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parentTransform: {fileID: 170445565}
+  parentTransform: {fileID: 18548410}
   controlEventManager: {fileID: 11400000, guid: a8c9cf2bc434199ecac824c6d78347ba, type: 2}
   cameraSettings: {fileID: 11400000, guid: 31d2a7382f65db78aa1c3c64415f9fb2, type: 2}
 --- !u!1 &1013952531
@@ -2384,7 +2400,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8804913995848168504, guid: fb7210100457f0e4eb4df22df335f637, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3821,7 +3837,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1722804692}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aeda7bfbf984f2a4da5ab4b8967b115d, type: 3}
   m_Name: 

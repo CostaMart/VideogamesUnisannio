@@ -23,7 +23,8 @@ public class ItemManager
             { "CharStats", 0},
             { "testUpdate", 1 },
             { "Ragdoller",  2 },
-            { "WeaponState", 3}
+            { "PrimaryWeaponState", 3},
+            {"SecondaryWeaponState", 4}
         };
 
         ComputeAllItems();
@@ -78,7 +79,7 @@ public class ItemManager
                             break;
 
                         default:
-                            throw new Exception("Effect type '" + type + "' not recognized");
+                            throw new Exception("Effect type object type: '" + type + "' not recognized for item: " + item.id);
                     }
 
                     i.effects.Add(e);
@@ -98,7 +99,7 @@ public class ItemManager
 
         catch (KeyNotFoundException e)
         {
-            Debug.LogError("Error while creating item: " + e.Message);
+            Debug.LogError("Error in Item manager unable to create an item: " + e.Message + " check the JSON item definition file");
         }
 
         return i;

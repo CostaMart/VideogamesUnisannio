@@ -5,27 +5,20 @@
             "name": "item 1",
             "effects": [
                 {
-                    "effectType": "ot",
-                    "target": "CharStats.4",
-                    "expr": "@CharStats.4 + 1",
-                    "totalDuration": 10,
-                    "rate": 1
+                    "effectType": "sa",
+                    "target": "SecondaryWeaponState.0",
+                    "expr": "@CharStats.4"
                 }
             ]
         },
         {
             "id": 1,
-            "name": "item 2",
+            "name": "Jump High",
             "effects": [
                 {
                     "effectType": "sa",
                     "target": "CharStats.3",
                     "expr": "@CharStats.3 + 100"
-                },
-                {
-                    "effectType": "sa",
-                    "target": "CharStats.5",
-                    "expr": "200"
                 }
             ]
         }
