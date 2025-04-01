@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
@@ -23,7 +22,11 @@ public class ItemManager
         {
             { "CharStats", 0},
             { "testUpdate", 1 },
+            { "Ragdoller",  2 },
+            { "WeaponState", 3}
         };
+
+        ComputeAllItems();
     }
 
     /// <summary>
@@ -33,7 +36,7 @@ public class ItemManager
     /// </summary>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public static Item ComputeAnItem()
+    public static Item ComputeAllItems()
     {
         Debug.Log("ComputeAnItem called");
 
@@ -100,6 +103,7 @@ public class ItemManager
 
         return i;
     }
+
 
     private class ItemJson
     {

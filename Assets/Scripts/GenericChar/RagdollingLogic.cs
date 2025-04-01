@@ -7,6 +7,8 @@ using UnityEngine.Events;
 
 public class Ragdoller : MonoBehaviour
 {
+    public bool ragdollFlag = false;
+    bool lastWas = false;
     Collider col;
     Rigidbody rb;
     Animator anim;
@@ -21,15 +23,36 @@ public class Ragdoller : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         Ragdolling(false);
 
-        controlEventManager.AddRagdollListener(Ragdolling);
+        controlEventManager.AddRagdollListener((rag) =>
+        {
+            ragdollFlag = rag;
+        });
     }
 
+
+    void Update()
+    {
+        if (ragdollFlag && !lastWas)
+        {
+            Ragdolling(true);
+            ragdollFlag = true;
+            lastWas = true;
+        }
+        if (!ragdollFlag && lastWas)
+        {
+            Ragdolling(false);
+            ragdollFlag = false;
+            lastWas = false;
+        }
+    }
 
     /*Activate or deactivate ragdolling*/
     void Ragdolling(bool ragdolling)
     {
 
+        Debug.Log("i've been called");
         Rigidbody[] r = GetComponentsInChildren<Rigidbody>();
+
         foreach (Rigidbody otherRigid in r)
         {
             if (rb != otherRigid)

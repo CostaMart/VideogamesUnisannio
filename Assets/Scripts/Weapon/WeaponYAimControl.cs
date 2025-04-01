@@ -25,7 +25,11 @@ public class WeapnYAimControl : MonoBehaviour
         controlEventManager.AddListenerAiming(OnAiming);
     }
 
-    void Update()
+    /// <summary>
+    /// By doing this operation in lateupdate i let the followed object move first!
+    /// otherwise there is a strange flickering effect
+    /// </summary>
+    void LateUpdate()
     {
 
         // Gestisci la rotazione verticale (X) con il movimento del mouse
@@ -36,6 +40,7 @@ public class WeapnYAimControl : MonoBehaviour
         rotationY = parentTransform.eulerAngles.y;
 
         var rotationz = parentTransform.eulerAngles.z;
+
         // Applica la rotazione finale
         transform.rotation = Quaternion.Euler(rotationX, rotationY, rotationz);
     }

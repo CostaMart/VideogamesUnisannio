@@ -75,6 +75,7 @@ public class PlayerControlManager : MonoBehaviour
     {
         if (Math.Abs(rb.linearVelocity.y) > playerSettings.SpeedLimitBeforeRagdolling || Math.Abs(rb.linearVelocity.x) > playerSettings.SpeedLimitBeforeRagdolling || Math.Abs(rb.linearVelocity.z) > playerSettings.SpeedLimitBeforeRagdolling)
         {
+            Debug.Log("request ragdolling start");
             ControlEventManager.raiseRagdollEvent(true);
         }
     }

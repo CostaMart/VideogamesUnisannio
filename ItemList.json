@@ -7,16 +7,23 @@
                 {
                     "effectType": "sa",
                     "target": "CharStats.4",
-                    "expr": "@CharStats.4 + 20",
-                    "totalduration": 10,
-                    "rate": 2
+                    "expr": "@CharStats.4 + 20"
+                }
+            ]
+        },
+        {
+            "id": 1,
+            "name": "item 2",
+            "effects": [
+                {
+                    "effectType": "sa",
+                    "target": "CharStats.3",
+                    "expr": "@CharStats.3 + 100"
                 },
                 {
                     "effectType": "sa",
-                    "target": "CharStats.4",
-                    "expr": "@CharStats.4 + 20",
-                    "totalduration": 10,
-                    "rate": 2
+                    "target": "CharStats.5",
+                    "expr": "200"
                 }
             ]
         }

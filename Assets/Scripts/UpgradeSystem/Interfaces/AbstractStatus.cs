@@ -8,27 +8,26 @@ using UnityEngine;
 /// </summary>
 public abstract class AbstractStatus : MonoBehaviour
 {
-    public FieldInfo[] fields;
-
-    public AbstractStatus()
-    {
-        ID = ItemManager.statClassToIdRegistry[this.GetType().Name];
-    }
+    private FieldInfo[] fields;
 
     /// <summary>
     /// ID of this affectable type 
     /// </summary>
     public int ID { get; private set; }
 
+    public AbstractStatus()
+    {
+        ID = ItemManager.statClassToIdRegistry[this.GetType().Name];
+    }
+
     void Awake()
     {
         new ItemManager();
         Type type = this.GetType();
         Debug.Log("Type: " + type);
-        fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
-        Debug.Log("Fields found: " + fields.Length);
+        fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
+        Debug.Log("Stat Fields found: " + fields.Length);
     }
-
 
     /// <summary>
     /// This method shall apply new values to attributes of this class referenced by their ID

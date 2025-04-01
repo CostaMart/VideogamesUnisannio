@@ -11,7 +11,6 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private EquipmentEventManager _equipmentEventManager;
     [SerializeField] private ControlEventManager _controlEventManager;
 
-
     void Awake()
     {
         _controlEventManager.AddListenerAiming((value) => { aiming = value; });

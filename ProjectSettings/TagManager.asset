@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 3
   tags:
   - terrain
+  - Bullet
+  - Item
   layers:
   - Default
   - TransparentFX

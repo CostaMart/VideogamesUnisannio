@@ -19,24 +19,21 @@ public class EffectsDispatcher : MonoBehaviour
     private List<AbstractEffect> activeOvertime = new List<AbstractEffect>();
     private List<AbstractEffect> readyForRemoval = new List<AbstractEffect>();
 
-    void Awake()
+    void OnCollisionEnter(Collision collision)
     {
-        FindComponentsInChildren<AbstractStatus>(transform);
-    }
-
-    void Update()
-    {
-        // TODO: solo per prototipazione, verranno eliminati 
-        if (Input.GetKeyDown(KeyCode.E))
+        if (collision.gameObject.CompareTag("Item"))
         {
-            Debug.Log("Dispatching upgrade");
-
-            Item it = ItemManager.ComputeAnItem();
-            Debug.Log("affectables count: " + affectables.Count());
-
-            ItemDispatch(it);
+            this.ItemDispatch(collision.gameObject.GetComponent<ItemMono>().item);
+            collision.gameObject.SetActive(false);
         }
     }
+    void Awake()
+    {
+        new ItemManager();
+        FindComponentsInChildren<AbstractStatus>(transform);
+
+    }
+
 
     /// <summary>
     /// EffectsDispatcher assures that the effects in activeOverTime are activated in the correct order and at fixed intervals 
