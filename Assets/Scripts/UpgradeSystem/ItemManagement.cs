@@ -14,6 +14,7 @@ public class ItemManager
     public static Dictionary<string, int> statClassToIdRegistry;
     public bool added = false;
     public static Dictionary<int, Item> globalItemPool = new Dictionary<int, Item>(); /// this contains all the items created by the game from the JSON file
+    public static Dictionary<int, Item> bulletPool = new Dictionary<int, Item>(); /// this contains all the items created by the game from the JSON file 
 
     static ItemManager()
     {
@@ -24,10 +25,16 @@ public class ItemManager
             { "testUpdate", 1 },
             { "Ragdoller",  2 },
             { "PrimaryWeaponState", 3},
-            {"SecondaryWeaponState", 4}
+            {"SecondaryWeaponState", 4},
+            {"BulletState",5},
+            {"PhysicalState", 6}
         };
 
-        ComputeAllItems();
+        globalItemPool = ComputeAllItems("/home/costamh/HeroDivers/ItemList.json");
+
+        Debug.Log("items compiled");
+
+        bulletPool = ComputeAllItems("/home/costamh/HeroDivers/Bullets.json");
     }
 
     /// <summary>
@@ -37,12 +44,13 @@ public class ItemManager
     /// </summary>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public static Item ComputeAllItems()
+    public static Dictionary<int, Item> ComputeAllItems(string path)
     {
         Debug.Log("ComputeAnItem called");
 
         // Leggi il JSON dal file
-        string text = File.ReadAllText("/home/costamh/HeroDivers/ItemList.json");
+        // TODO: cambiare il path in modo che sia relativo al progetto
+        string text = File.ReadAllText(path);
 
         // Deserializza il JSON in ItemJson, che contiene la proprietà item
         ItemJson data = JsonConvert.DeserializeObject<ItemJson>(text);
@@ -51,6 +59,8 @@ public class ItemManager
         // ma i parametri sono presi dinamicaente dal file JSON
         // Accesso ai dati
         Item i = null;
+        Dictionary<int, Item> items = new Dictionary<int, Item>();
+
         try
         {
             foreach (var item in data.items)  // per ogni item json
@@ -68,6 +78,7 @@ public class ItemManager
                 {
                     var type = effect["effectType"].ToString();
                     AbstractEffect e = null;
+
                     switch (type)
                     {
                         case "sa":
@@ -86,13 +97,13 @@ public class ItemManager
                     effectID++;
                 }
 
-                if (globalItemPool.ContainsKey(i.id))
+                if (items.ContainsKey(i.id))
                 {
                     throw new Exception("Item with ID " + i.id + " already exists in the global pool. Skipping creation.");
                 }
                 else
                 {
-                    globalItemPool.Add(i.id, i);
+                    items.Add(i.id, i);
                 }
             }
         }
@@ -102,7 +113,7 @@ public class ItemManager
             Debug.LogError("Error in Item manager unable to create an item: " + e.Message + " check the JSON item definition file");
         }
 
-        return i;
+        return items;
     }
 
 

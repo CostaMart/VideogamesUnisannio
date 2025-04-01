@@ -34,8 +34,9 @@ public abstract class AbstractStatus : MonoBehaviour
         effectsToRemove.Clear();
     }
 
-    void Awake()
+    public void Awake()
     {
+        Debug.Log("Assigning ID to status class " + this.GetType().Name);
         ID = ComputeID();
         new ItemManager();
         Type type = this.GetType();
@@ -49,9 +50,9 @@ public abstract class AbstractStatus : MonoBehaviour
     /// <paramref name="id"/> ID of the attribute to change
     /// <paramref name="newValue"/> new value to apply
     /// </summary>
-    public void SetStatByID(int id, float newValue)
+    public void SetStatByID(int id, object newValue)
     {
-        fields[id].SetValue(this, newValue);
+        fields[id].SetValue(this, Convert.ChangeType(newValue, fields[id].FieldType));
     }
 
     /// <summary>

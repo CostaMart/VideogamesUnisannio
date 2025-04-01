@@ -1,0 +1,25 @@
+{
+    "items": [
+        {
+            "id": 0,
+            "name": "item 1",
+            "effects": [
+                {
+                    "effectType": "sa",
+                    "target": "PhysicalState.1",
+                    "expr": "false"
+                },
+                {
+                    "effectType": "sa",
+                    "target": "PhysicalState.2",
+                    "expr": "200"
+                },
+                {
+                    "effectType": "sa",
+                    "target": "PhysicalState.0",
+                    "expr": "1"
+                }
+            ]
+        }
+    ]
+}

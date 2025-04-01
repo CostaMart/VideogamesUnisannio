@@ -26,7 +26,7 @@ public class EffectsDispatcher : MonoBehaviour
             collision.gameObject.SetActive(false);
         }
     }
-    void Awake()
+    void Start()
     {
         new ItemManager();
         FindComponentsInChildren<AbstractStatus>(transform);
@@ -48,6 +48,7 @@ public class EffectsDispatcher : MonoBehaviour
         foreach (AbstractEffect up in it.effects)
         {
             up.Attach(affectables[up.targetClassID], this);
+
         }
     }
 
@@ -104,13 +105,14 @@ public class EffectsDispatcher : MonoBehaviour
             {
                 try
                 {
+                    Debug.Log("Found component of type " + upgradable.GetType().Name + " in object: " + transform.gameObject.name + "in object" + parent.name + "with ID: " + upgradable.ID);
                     affectables.Add(upgradable.ID, upgradable);
                 }
                 catch (ArgumentException e)
                 {
                     if (upgradable.GetType().Name == "WeaponState")
                     {
-                        Debug.LogError("This character has two Weapon of the same type (primary or secondary), please check gameobject: " + transform.gameObject.name);
+                        Debug.LogError("This character has two Weapon of the same type (primary or secondary), please check gameobject: " + transform.gameObject.name + "in object" + parent.name);
                     }
                     else
                     {

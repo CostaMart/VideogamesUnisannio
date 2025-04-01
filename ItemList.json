@@ -6,8 +6,8 @@
             "effects": [
                 {
                     "effectType": "sa",
-                    "target": "SecondaryWeaponState.0",
-                    "expr": "@CharStats.4"
+                    "target": "CharStats.3",
+                    "expr": "1000"
                 }
             ]
         },
