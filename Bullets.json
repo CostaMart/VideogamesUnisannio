@@ -7,7 +7,7 @@
                 {
                     "effectType": "sa",
                     "target": "PhysicalState.1",
-                    "expr": "not( @PhysicalState.1 )"
+                    "expr": "false"
                 },
                 {
                     "effectType": "sa",

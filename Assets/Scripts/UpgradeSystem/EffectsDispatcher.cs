@@ -47,6 +47,7 @@ public class EffectsDispatcher : MonoBehaviour
     {
         foreach (AbstractEffect up in it.effects)
         {
+            Debug.Log("attaching effect " + up.GetType().Name + " to class ID: " + up.targetClassID);
             up.Attach(affectables[up.targetClassID], this);
 
         }
