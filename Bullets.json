@@ -7,7 +7,7 @@
                 {
                     "effectType": "sa",
                     "target": "PhysicalState.1",
-                    "expr": "false"
+                    "expr": "not( @PhysicalState.1 )"
                 },
                 {
                     "effectType": "sa",
@@ -16,8 +16,13 @@
                 },
                 {
                     "effectType": "sa",
-                    "target": "PhysicalState.0",
-                    "expr": "1"
+                    "target": "PhysicalState.3",
+                    "expr": "200"
+                },
+                {
+                    "effectType": "sa",
+                    "target": "PhysicalState.4",
+                    "expr": "200"
                 }
             ]
         }

@@ -166,4 +166,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseDamage: 0
   baseWeight: 0
-  explosionRadius: 100
+  explosionRadius: 1

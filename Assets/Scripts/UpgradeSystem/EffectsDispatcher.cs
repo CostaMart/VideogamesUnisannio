@@ -58,9 +58,9 @@ public class EffectsDispatcher : MonoBehaviour
     /// <paramref name="calssID"/> the ID of the class to reference
     /// <paramref name="attributeID"/> the ID of the attribute to reference
     /// </summary>
-    public float[] ResolveValue(int[][] references)
+    public object[] ResolveValue(int[][] references)
     {
-        float[] toret = new float[references.Length];
+        object[] toret = new object[references.Length];
         int x = 0;
 
 
@@ -69,7 +69,7 @@ public class EffectsDispatcher : MonoBehaviour
             try
             {
                 var referencedClass = affectables[refere[0]];
-                float referencedAttributeVal = referencedClass.GetStatByID(refere[1]);
+                var referencedAttributeVal = referencedClass.GetStatByID(refere[1]);
                 toret[x] = referencedAttributeVal;
                 x++;
             }

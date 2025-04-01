@@ -59,11 +59,11 @@ public abstract class AbstractStatus : MonoBehaviour
     /// This method shall resolve and return the value of a parameter by its ID
     /// <paramref name="id"/> ID of the parameter to resolve
     /// </summary>
-    public float GetStatByID(int id)
+    public object GetStatByID(int id)
     {
         if (id < fields.Length)
         {
-            return (float)fields[id].GetValue(this);
+            return fields[id].GetValue(this);
         }
         else
         {

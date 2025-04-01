@@ -30,7 +30,7 @@ public abstract class AbstractEffect
     /// <summary>
     /// This array the value of the parameters in parametersRef, it is updated at each DoEffect call
     /// </summary>
-    public float[] resolvedVals;
+    public object[] resolvedVals;
 
     /// <summary>
     /// ID of the class to be affected

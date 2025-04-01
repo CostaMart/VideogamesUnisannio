@@ -45,14 +45,17 @@ public class PhysicalState : AbstractStatus
         if (forcey != -1f)
         {
             rb.AddForce(new Vector3(0, forcey, 0), ForceMode.Force);
+            forcey = -1f;
         }
         if (forcex != -1f)
         {
             rb.AddForce(new Vector3(forcex, 0, 0), ForceMode.Force);
+            forcex = -1f;
         }
         if (forcez != -1f)
         {
             rb.AddForce(new Vector3(0, 0, forcez), ForceMode.Force);
+            forcez = -1f;
         }
 
     }
