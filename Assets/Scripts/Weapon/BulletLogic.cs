@@ -10,6 +10,8 @@ public class Bullet : MonoBehaviour
     private Vector3 initialPos;
     private Rigidbody rb;
     private Collider c;
+
+
     [SerializeField] private BulletState bulletState;
     private float EnableTime;
 
@@ -19,6 +21,7 @@ public class Bullet : MonoBehaviour
     {
         c = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
+        bulletState = transform.GetComponent<BulletState>();
         initialPos = transform.position;
     }
 
@@ -34,8 +37,6 @@ public class Bullet : MonoBehaviour
             }
         }
     }
-
-    public Vector3 gizmopos;
 
     // Update is called once per frame
     // quando avviene una collisione il proiettile torna al luogo di origine, disattivando la fisica in modo tale da non dare fastidio.
@@ -59,14 +60,10 @@ public class Bullet : MonoBehaviour
             }
         }
 
-        resetItem();
+        if (bulletState.destroyOnHit)
+            resetItem();
     }
 
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(gizmopos, bulletState.explosionRadius);
-    }
 
     void resetItem()
     {

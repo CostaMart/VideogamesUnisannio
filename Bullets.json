@@ -12,17 +12,17 @@
                 {
                     "effectType": "sa",
                     "target": "PhysicalState.2",
-                    "expr": "200"
+                    "expr": "10 * @BulletState.4"
                 },
                 {
                     "effectType": "sa",
                     "target": "PhysicalState.3",
-                    "expr": "200"
+                    "expr": "10 * @BulletState.5"
                 },
                 {
                     "effectType": "sa",
                     "target": "PhysicalState.4",
-                    "expr": "200"
+                    "expr": "10 * @BulletState.6"
                 }
             ]
         }

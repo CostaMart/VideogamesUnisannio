@@ -9,7 +9,9 @@ public class CharStats : AbstractStatus
     [SerializeField] private float rotationSpeed = 0.5f;
     [SerializeField] private float life = 100;
     [SerializeField] private float aimRotationSpeed = 5f;
-    [SerializeField] private float jumpSpeed = 5f;
+    [SerializeField] public float jumpSpeedy = 5f;
+    [SerializeField] public float jumpSpeedx = 5f;
+    [SerializeField] public float jumpSpeedz = 5f;
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float speedLimitBeforeRagdolling = 20f;
     [SerializeField] private int maxJumps = 1;
@@ -17,9 +19,7 @@ public class CharStats : AbstractStatus
     public float Life => life;
     public float RotationSpeed => rotationSpeed;
     public float AimRotationSpeed => aimRotationSpeed;
-    public float JumpSpeed => jumpSpeed;
     public float MoveSpeed => moveSpeed;
-    public float AnotherJumpSpeed => JumpSpeed;
     public int MaxJumps => maxJumps;
     public float SpeedLimitBeforeRagdolling => speedLimitBeforeRagdolling;
 

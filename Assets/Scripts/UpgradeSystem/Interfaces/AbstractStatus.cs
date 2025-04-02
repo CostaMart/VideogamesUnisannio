@@ -42,7 +42,11 @@ public abstract class AbstractStatus : MonoBehaviour
         Type type = this.GetType();
         Debug.Log("Type: " + type);
         fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        Debug.Log("Stat Fields found: " + fields.Length);
+
+        foreach (var field in fields)
+        {
+            Debug.Log("Field: " + field.Name);
+        }
     }
 
     /// <summary>

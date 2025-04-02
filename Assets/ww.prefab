@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3040519736505940319}
   - component: {fileID: 1699630561668768913}
   - component: {fileID: 2298636893042404977}
-  - component: {fileID: -74755637761183440}
+  - component: {fileID: 5216587253964293341}
   m_Layer: 0
   m_Name: ww
   m_TagString: Bullet
@@ -103,7 +103,7 @@ BoxCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -123,8 +123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7afb6ac62da08e824aa13052daeb3703, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletState: {fileID: -74755637761183440}
-  gizmopos: {x: 0, y: 0, z: 0}
+  bulletState: {fileID: 0}
 --- !u!54 &2298636893042404977
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -144,7 +143,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
@@ -152,7 +151,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &-74755637761183440
+--- !u!114 &5216587253964293341
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -164,6 +163,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53194b117b6c388c8824a90cf371cacd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseDamage: 0
-  baseWeight: 0
+  baseMass: 2
   explosionRadius: 1
+  destroyOnHit: 1
+  widthScale: 20
+  heightScale: 1
+  lengthScale: 1

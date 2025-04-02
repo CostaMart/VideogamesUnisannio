@@ -1,10 +1,5 @@
 
-using Unity.Cinemachine;
 using UnityEngine;
-using Quaternion = UnityEngine.Quaternion;
-using Vector2 = UnityEngine.Vector2;
-using Vector3 = UnityEngine.Vector3;
-
 
 public class PhysicalState : AbstractStatus
 {
@@ -12,10 +7,13 @@ public class PhysicalState : AbstractStatus
 
     public bool isaffectedByGravity = true;
 
-    public float forcey = -1f;
-    public float forcex = -1;
-    public float forcez = -1f;
+    public float forcey = 0f;
+    public float forcex = 0f;
+    public float forcez = 0f;
     public float linearDumping = 2f;
+    public float widthScale = 1f;
+    public float heightScale = 1f;
+    public float lengthScale = 1f;
 
     private Rigidbody rb;
 
@@ -31,6 +29,7 @@ public class PhysicalState : AbstractStatus
         base.Awake();
         rb = GetComponent<Rigidbody>();
     }
+
     new void Update()
     {
 
@@ -41,22 +40,10 @@ public class PhysicalState : AbstractStatus
         rb.useGravity = isaffectedByGravity;
         rb.linearDamping = linearDumping;
 
-
-        if (forcey != -1f)
-        {
-            rb.AddForce(new Vector3(0, forcey, 0), ForceMode.Force);
-            forcey = -1f;
-        }
-        if (forcex != -1f)
-        {
-            rb.AddForce(new Vector3(forcex, 0, 0), ForceMode.Force);
-            forcex = -1f;
-        }
-        if (forcez != -1f)
-        {
-            rb.AddForce(new Vector3(0, 0, forcez), ForceMode.Force);
-            forcez = -1f;
-        }
-
+        transform.localScale = new Vector3(widthScale, heightScale, lengthScale);
+        rb.AddForce(forcex, forcey, forcez, ForceMode.VelocityChange);
+        forcex = 0f;
+        forcey = 0f;
+        forcez = 0f;
     }
 }

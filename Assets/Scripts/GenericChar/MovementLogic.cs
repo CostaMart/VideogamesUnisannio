@@ -94,8 +94,15 @@ public class MovementLogic : MonoBehaviour
 
     public void Jump()
     {
+        Vector3 direction = Vector3.zero;
+
+        direction += camera.transform.forward * moveDirection.y;
+        direction += camera.transform.right * moveDirection.x;
+
         if (jumpsAvailable <= 0) return;
-        rb.linearVelocity = new Vector3(rb.linearVelocity.x, playerSettings.JumpSpeed, rb.linearVelocity.z);
+
+
+        rb.linearVelocity = new Vector3(direction.x * playerSettings.jumpSpeedx, playerSettings.jumpSpeedy, direction.z * playerSettings.jumpSpeedz);
         jumpsAvailable--;
     }
 
