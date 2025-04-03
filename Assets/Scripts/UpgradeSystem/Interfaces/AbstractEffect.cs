@@ -1,9 +1,11 @@
 using NCalc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Rendering.HighDefinition;
 
 /// <summary>
 /// Implement this to participate to the upgrade system and define your own effects
@@ -25,20 +27,32 @@ public abstract class AbstractEffect
     /// <summary>
     /// This is the list of parameters translated into index from the 'expr' string of the json effect
     /// </summary>
-    public int[][] parametersRef;
+    public int[][] localParametersRef;
+
+    public AbstractStatus[] localParametersRefClasses = new AbstractStatus[0];
+
+    public AbstractStatus[] externParametersRefClasses = new AbstractStatus[0];
+
+    public char[] localParametersKey;
+
+    public int[][] externParametersRef;
+    public char[] externParametersKey;
 
     /// <summary>
     /// This array the value of the parameters in parametersRef, it is updated at each DoEffect call
     /// </summary>
-    public object[] resolvedVals;
+    public object[] resolvedValsLocal;
+    public object[] resolvedValsExternal;
 
     /// <summary>
     /// ID of the class to be affected
     /// </summary>
-    public int targetClassID { get; private set; }
+    public int localTargetClassID = -1;
+
+    public int externalTargetClassID = -1;
 
     /// <summary>
-    /// ID of the attribute to be affected within the class specified by <see cref="targetClassID"/>
+    /// ID of the attribute to be affected within the class specified by <see cref="localTargetClassID"/>
     /// </summary>
     public int targetAttributeID { get; private set; }
 
@@ -49,21 +63,41 @@ public abstract class AbstractEffect
     /// </summary>
     /// <param name="data"></param>
     /// <param name="itemID"></param>
-    public AbstractEffect(Dictionary<string, string> data, int itemID)
+    public AbstractEffect(Dictionary<string, string> data, int itemID, bool inABullet)
     {
 
         string targetClassString = data["target"];
         string s = data["expr"];
 
 
+        // search for parameters to resolve locally
         MatchCollection matches = Regex.Matches(data["expr"], @"@\w+\.\d+");
-        targetClassID = ItemManager.statClassToIdRegistry[targetClassString.Split(".")[0]];
+        MatchCollection external = Regex.Matches(data["expr"], @"!\w+\.\d+");
+
+        if (targetClassString.Contains("@"))
+        {
+            localTargetClassID = ItemManager.statClassToIdRegistry[targetClassString.Split(".")[0].Replace("@", "")];
+        }
+        else if (targetClassString.Contains("!"))
+        {
+            externalTargetClassID = ItemManager.statClassToIdRegistry[targetClassString.Split(".")[0].Replace("!", "")];
+        }
+
         targetAttributeID = int.Parse(targetClassString.Split(".")[1]);
 
 
         char c = 'A';
         int len = matches.Count;
-        parametersRef = new int[len][];
+        localParametersRef = new int[len][];
+        localParametersKey = new char[len];
+        Debug.Log("this is the numebr of local parameters " + len + "for item " + itemID);
+
+        len = external.Count;
+
+        externParametersRef = new int[len][];
+        externParametersKey = new char[len];
+
+        Debug.Log("this is the numebr of external parameters " + len + "for item " + itemID);
         int i = 0;
 
         // cerchiamo nella stringa tutti i riferimenti a variabili di altre classi, nel caso se ne trovino vengono sostituite con un ID alfabetico nella stringa dell'espression
@@ -75,13 +109,47 @@ public abstract class AbstractEffect
             string laClass = match.ToString().Split('.')[0].Substring(1);
             int laAttribute = int.Parse(match.ToString().Split('.')[1]);
 
-            parametersRef[i] = new int[2];
-            parametersRef[i][0] = ItemManager.statClassToIdRegistry[laClass];
-            parametersRef[i][1] = laAttribute;
+            localParametersRef[i] = new int[2];
+            localParametersRef[i][0] = ItemManager.statClassToIdRegistry[laClass];
+            localParametersRef[i][1] = laAttribute;
+            localParametersKey[i] = c;
+
+            Debug.Log("it is just been assigned key " + c.ToString() + " for item " + itemID);
+            c += (char)1;
+            i++;
+        }
+
+        foreach (var match in external)
+        {
+            s = s.Replace(match.ToString(), c.ToString());
+            string laClass = match.ToString().Split('.')[0].Substring(1);
+            int laAttribute = int.Parse(match.ToString().Split('.')[1]);
+
+            externParametersRef[i] = new int[2];
+            externParametersRef[i][0] = ItemManager.statClassToIdRegistry[laClass];
+            externParametersRef[i][1] = laAttribute;
+            externParametersKey[i] = c;
 
             c += (char)1;
             i++;
         }
+
+        if (!inABullet)
+        {
+            if (external.Count > 0)
+            {
+                if (!data.ContainsKey("targetType") || data["targetType"] == "local")
+                {
+                    Debug.LogError("External parameters found but no target type specified. This effect will not be applied.");
+                    return;
+                }
+            }
+        }
+
+        Debug.Log("for item " + itemID + " this is the expression: " + s);
+        Debug.Log("this are local parameters: " + localParametersRef.Length);
+        Debug.Log("this are external parameters: " + externParametersRef.Length);
+
 
         ex = new Expression(s);
     }
@@ -96,16 +164,57 @@ public abstract class AbstractEffect
     /// </param>
     protected float DoEffect()
     {
-        resolvedVals = dispatcher.ResolveValue(parametersRef);
+        resolvedValsLocal = resolveValues(localParametersRefClasses, localParametersRef);
+        resolvedValsExternal = resolveValues(externParametersRefClasses, externParametersRef);
 
-        char c = 'A';
-        foreach (var value in resolvedVals)
+        var x = 0;
+        Debug.Log("intrnal keys available: " + localParametersKey.Length);
+        Debug.Log("internal classes reference available: " + localParametersRefClasses.Length);
+        foreach (var reference in localParametersRefClasses)
         {
-            ex.Parameters[c.ToString()] = value;
-            c += (char)1;
+            Debug.Log("internal keys resolved: " + localParametersKey[x].ToString());
+            ex.Parameters[localParametersKey[x].ToString()] = resolvedValsLocal[x];
+            x++;
         }
 
-        return Convert.ToSingle(ex.Evaluate());
+        x = 0;
+        Debug.Log("external keys available: " + externParametersKey.Length);
+        Debug.Log("external classes reference available: " + externParametersRefClasses.Length);
+        foreach (var reference in externParametersRefClasses)
+        {
+            Debug.Log("external keys resolved: " + externParametersKey[x].ToString());
+            ex.Parameters[externParametersKey[x].ToString()] = resolvedValsExternal[x];
+            x++;
+        }
+
+
+        try
+        {
+            var returnable = Convert.ToSingle(ex.Evaluate());
+            Debug.Log("expression computed : " + ex.ToString() + " for item " + ID);
+
+            return returnable;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Error in expression evaluation: " + e.Message);
+        }
+
+        return 0;
+    }
+
+    private object[] resolveValues(AbstractStatus[] statusClass, int[][] paramIndexes)
+    {
+        Debug.Log("resolving values for " + statusClass.GetType().Name + " parameters");
+        var x = 0;
+        object[] resolved = new object[statusClass.Length];
+
+        foreach (var refClass in statusClass)
+        {
+            resolved[x] = refClass.GetStatByID(paramIndexes[x][1]);
+        }
+
+        return resolved;
     }
 
     /// <summary>
@@ -129,4 +238,20 @@ public abstract class AbstractEffect
     /// TODO: potrei voler levare target come parametro per impedire a chi scrive gli effetti di fare cose strane
     public abstract float? Activate(AbstractStatus target);
 
+    public new string ToString()
+
+    {
+        string toret = "Effect ID: " + ID + "\n";
+        toret += "Target class ID: " + localTargetClassID + "\n";
+        toret += "Target attribute ID: " + targetAttributeID + "\n";
+        toret += "Expression: " + ex.ToString() + "\n";
+        toret += "Parameters: \n";
+
+        foreach (var param in localParametersRef)
+        {
+            toret += param[0] + "." + param[1] + "\n";
+        }
+
+        return toret;
+    }
 }

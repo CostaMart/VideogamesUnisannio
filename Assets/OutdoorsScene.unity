@@ -425,7 +425,7 @@ MonoBehaviour:
   jumpSpeedx: 5
   jumpSpeedz: 5
   moveSpeed: 15
-  speedLimitBeforeRagdolling: 60
+  speedLimitBeforeRagdolling: 2000
   maxJumps: 1
 --- !u!114 &18548423
 MonoBehaviour:
@@ -2136,7 +2136,6 @@ GameObject:
   - component: {fileID: 963133282}
   - component: {fileID: 963133287}
   - component: {fileID: 963133286}
-  - component: {fileID: 963133288}
   - component: {fileID: 963133289}
   m_Layer: 0
   m_Name: Cube
@@ -2252,8 +2251,8 @@ MonoBehaviour:
   forcex: 0
   forcez: 0
   linearDumping: 2
-  widthScale: 1
-  heightScale: 1
+  widthScale: 3.4874
+  heightScale: 5.2575
   lengthScale: 1
 --- !u!54 &963133287
 Rigidbody:
@@ -2282,27 +2281,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!65 &963133288
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 963133280}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 0.99999994, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &963133289
 MonoBehaviour:
   m_ObjectHideFlags: 0

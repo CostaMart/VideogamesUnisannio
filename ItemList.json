@@ -2,23 +2,12 @@
     "items": [
         {
             "id": 0,
-            "name": "item 1",
-            "effects": [
-                {
-                    "effectType": "sa",
-                    "target": "CharStats.3",
-                    "expr": "1000"
-                }
-            ]
-        },
-        {
-            "id": 1,
             "name": "Jump High",
             "effects": [
                 {
                     "effectType": "sa",
-                    "target": "CharStats.3",
-                    "expr": "@CharStats.3 + 100"
+                    "target": "@CharStats.3",
+                    "expr": "@CharStats.0 + 100"
                 }
             ]
         }

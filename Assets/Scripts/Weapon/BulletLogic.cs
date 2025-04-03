@@ -15,7 +15,6 @@ public class Bullet : MonoBehaviour
     [SerializeField] private BulletState bulletState;
     private float EnableTime;
 
-    Item bulletEffets = ItemManager.bulletPool[0]; // TODO: questo è un prototipo, in futuro dovrà essere passato come parametro
 
     void Awake()
     {
@@ -51,7 +50,7 @@ public class Bullet : MonoBehaviour
                 try
                 {
                     Debug.Log("Dispatching effects to " + col.gameObject.name);
-                    d.ItemDispatch(bulletEffets);
+                    d.ItemDispatchFromExternalSource(bulletState.bulletEffets);
                 }
                 catch (Exception e)
                 {

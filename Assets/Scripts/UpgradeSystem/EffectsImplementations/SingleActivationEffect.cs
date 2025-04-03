@@ -8,7 +8,7 @@ using UnityEngine;
 public class SingleActivationEffect : AbstractEffect
 {
 
-  public SingleActivationEffect(Dictionary<string, string> data, int itemID, int effectID) : base(data, itemID) { }
+  public SingleActivationEffect(Dictionary<string, string> data, int itemID, int effectID, bool inABullet) : base(data, itemID, inABullet) { }
   public override float? Activate(AbstractStatus target)
   {
     var result = base.DoEffect();

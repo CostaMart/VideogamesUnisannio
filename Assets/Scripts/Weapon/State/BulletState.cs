@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using static ItemManager;
 
 namespace Weapon.State
 {
@@ -10,6 +11,7 @@ namespace Weapon.State
         [SerializeField] public float baseMass = 2;
         [SerializeField] public float explosionRadius = 2;
         [SerializeField] public bool destroyOnHit = true;
+        public Item bulletEffets;
 
         public float directionx;
         public float directiony;

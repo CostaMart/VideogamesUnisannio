@@ -7,7 +7,8 @@ public class ItemMono : MonoBehaviour
 
     void OnCollisionStay(Collision collision)
     {
-        Debug.Log("press E");
+        Debug.Log("item raccolto dal giocatore : " + item.id);
+        Debug.Log("item raccolto dal giocatore : " + item.name);
     }
 
 }

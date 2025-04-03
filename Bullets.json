@@ -1,28 +1,14 @@
 {
     "items": [
         {
-            "id": 0,
-            "name": "item 1",
+            "id": 3,
+            "name": "Bullet 1",
             "effects": [
                 {
+                    "targetType": "area",
                     "effectType": "sa",
-                    "target": "PhysicalState.1",
-                    "expr": "false"
-                },
-                {
-                    "effectType": "sa",
-                    "target": "PhysicalState.2",
-                    "expr": "10 * @BulletState.4"
-                },
-                {
-                    "effectType": "sa",
-                    "target": "PhysicalState.3",
-                    "expr": "10 * @BulletState.5"
-                },
-                {
-                    "effectType": "sa",
-                    "target": "PhysicalState.4",
-                    "expr": "10 * @BulletState.6"
+                    "target": "!PhysicalState.0",
+                    "expr": "@CharStats.4"
                 }
             ]
         }

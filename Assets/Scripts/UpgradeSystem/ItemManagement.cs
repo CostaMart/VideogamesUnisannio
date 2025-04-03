@@ -30,11 +30,11 @@ public class ItemManager
             {"PhysicalState", 6}
         };
 
-        globalItemPool = ComputeAllItems("/home/costamh/HeroDivers/ItemList.json");
+        globalItemPool = ComputeAllItems("/home/costamh/HeroDivers/ItemList.json", false);
 
         Debug.Log("items compiled");
 
-        bulletPool = ComputeAllItems("/home/costamh/HeroDivers/Bullets.json");
+        bulletPool = ComputeAllItems("/home/costamh/HeroDivers/Bullets.json", true);
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ public class ItemManager
     /// </summary>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public static Dictionary<int, Item> ComputeAllItems(string path)
+    public static Dictionary<int, Item> ComputeAllItems(string path, bool isbullet)
     {
         Debug.Log("ComputeAnItem called");
 
@@ -72,6 +72,7 @@ public class ItemManager
 
                 i.name = item.name;
                 i.id = item.id;
+                i.bullet = isbullet;
                 int effectID = 0;
 
                 foreach (var effect in item.effects) // per ogni effetto nella lista
@@ -82,16 +83,19 @@ public class ItemManager
                     switch (type)
                     {
                         case "sa":
-                            e = new SingleActivationEffect(effect, item.id, effectID);
+                            e = new SingleActivationEffect(effect, item.id, effectID, isbullet);
                             break;
 
                         case "ot":
-                            e = new OverTimeEffect(effect, item.id, effectID);
+                            e = new OverTimeEffect(effect, item.id, effectID, isbullet);
                             break;
 
                         default:
                             throw new Exception("Effect type object type: '" + type + "' not recognized for item: " + item.id);
                     }
+
+                    if (e == null)
+                        continue;
 
                     i.effects.Add(e);
                     effectID++;
@@ -110,7 +114,8 @@ public class ItemManager
 
         catch (KeyNotFoundException e)
         {
-            Debug.LogError("Error in Item manager unable to create an item: " + e.Message + " check the JSON item definition file");
+            Debug.LogError("Error in Item manager unable to create an item with error: " + e.Message + " check the JSON item definition file" + e.StackTrace);
+
         }
 
         return items;
@@ -131,6 +136,7 @@ public class ItemManager
     }
     public class Item
     {
+        public bool bullet;
         public string name;
         public int id;
         public List<AbstractEffect> effects;

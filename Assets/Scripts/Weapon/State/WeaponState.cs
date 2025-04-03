@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using static ItemManager;
 
 public class WeaponState : AbstractStatus
 {
@@ -24,6 +25,9 @@ public class WeaponState : AbstractStatus
     public float FireRate => fireRate;
     public bool reloading = false;
     public float fireStrength = 1f;
+
+    public Item bulletEffects;
+
     // Update is called once per frame
     void Update()
     {

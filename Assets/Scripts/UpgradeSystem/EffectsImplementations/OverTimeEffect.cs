@@ -12,7 +12,7 @@ class OverTimeEffect : AbstractEffect
     private float activationTimer = 0;
     private float totalTimeElapsed = 0;
 
-    public OverTimeEffect(Dictionary<string, string> data, int itemID, int effectID) : base(data, itemID)
+    public OverTimeEffect(Dictionary<string, string> data, int itemID, int effectID, bool inABullet) : base(data, itemID, inABullet)
 
     {
         if (!data.ContainsKey("totalDuration") || !data.ContainsKey("rate"))

@@ -59,6 +59,7 @@ namespace Weapon.State
             bullet.SetActive(true);
             bullet.transform.position = muzzle.position;
             bullet.transform.rotation = muzzle.rotation;
+            bullet.GetComponent<BulletState>().bulletEffets = weaponStat.bulletEffects;
             bullet.GetComponent<Rigidbody>().linearVelocity = muzzle.forward * weaponStat.fireStrength;
 
             shootingIndex = (int)((shootingIndex + 1) % weaponStat.magSize);
