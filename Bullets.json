@@ -7,8 +7,8 @@
                 {
                     "targetType": "area",
                     "effectType": "sa",
-                    "target": "!PhysicalState.0",
-                    "expr": "@CharStats.4"
+                    "target": "!PhysicalState.1",
+                    "expr": "false"
                 }
             ]
         }

@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEditor.Timeline.Actions;
 using UnityEngine;
-using Weapon.State;
 using static ItemManager;
 
 /// <summary>
@@ -12,35 +9,22 @@ using static ItemManager;
 /// 
 /// this class shall manage overTime effects activation too
 /// </summary>
-public class EffectsDispatcher : MonoBehaviour
+public abstract class EffectsDispatcher : MonoBehaviour
 {
 
     [SerializeField] Dictionary<int, AbstractStatus> affectables = new Dictionary<int, AbstractStatus>();
     [SerializeField] private ControlEventManager controlEventManager;
-    private List<AbstractEffect> toExternalDispatch = new List<AbstractEffect>();
+    protected List<AbstractEffect> toExternalDispatchArea = new List<AbstractEffect>();
 
 
-    void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Item"))
-        {
-            ItemDispatch(collision.gameObject.GetComponent<ItemMono>().item);
-        }
-    }
+
+
     void Start()
     {
         new ItemManager();
         FindComponentsInChildren<AbstractStatus>(transform);
-
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.E) && transform.name == "PBRCharacter")
-        {
-            ItemDispatch(ItemManager.bulletPool[3]);
-        }
-    }
 
 
     /// <summary>
@@ -51,7 +35,7 @@ public class EffectsDispatcher : MonoBehaviour
     {
         Debug.Log("Dispatching bullet effect " + it.ToString());
 
-        if (it.name.Contains("Bullet"))
+        if (it.bullet)
         {
             foreach (var effect in it.effects)
             {
@@ -70,7 +54,8 @@ public class EffectsDispatcher : MonoBehaviour
 
             if (up.localTargetClassID == -1)
             {
-                toExternalDispatch.Add(up);
+                Debug.Log("attaching for external deploy");
+                toExternalDispatchArea.Add(up);
                 continue;
             }
 
@@ -78,7 +63,7 @@ public class EffectsDispatcher : MonoBehaviour
         }
     }
 
-    public void ItemDispatchFromExternalSource(Item it)
+    public void DispatchFromExternalSource(Item it)
     {
         foreach (AbstractEffect up in it.effects)
         {
@@ -90,6 +75,12 @@ public class EffectsDispatcher : MonoBehaviour
         }
     }
 
+    public void DispatchFromExternalSource(AbstractEffect up)
+    {
+        up.externParametersRefClasses = attachReferences(up.externParametersRef);
+        Debug.Log("this is external target " + up.externalTargetClassID);
+        up.Attach(affectables[up.externalTargetClassID], this);
+    }
 
     /// <summary>
     /// If a member of effect class has a reference to an attribute in a status class, this method is called to resolve the current value of such reference
@@ -166,5 +157,9 @@ public class EffectsDispatcher : MonoBehaviour
         }
     }
 
+    void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(transform.position, 5);
+    }
 }
 

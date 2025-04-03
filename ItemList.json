@@ -6,8 +6,8 @@
             "effects": [
                 {
                     "effectType": "sa",
-                    "target": "@CharStats.3",
-                    "expr": "@CharStats.0 + 100"
+                    "target": "@CharStats.6",
+                    "expr": "120"
                 }
             ]
         }

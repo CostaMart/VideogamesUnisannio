@@ -22,7 +22,7 @@ public abstract class AbstractEffect
     /// expression to compute new vals from this effect.
     /// It is already in its compiled form, so it is not necessary to compile it again.
     /// </summary>
-    private Expression ex;
+    public Expression ex;
 
     /// <summary>
     /// This is the list of parameters translated into index from the 'expr' string of the json effect
@@ -154,6 +154,8 @@ public abstract class AbstractEffect
         ex = new Expression(s);
     }
 
+    public AbstractEffect() { }
+
     /// <summary>
     /// This method applies the effect to the target. It resolves the parameters and applies the expression to compute the new value for the target attribute.
     /// </summary>
@@ -180,9 +182,12 @@ public abstract class AbstractEffect
         x = 0;
         Debug.Log("external keys available: " + externParametersKey.Length);
         Debug.Log("external classes reference available: " + externParametersRefClasses.Length);
+        Debug.Log("this is the expression: " + ex.ToString());
         foreach (var reference in externParametersRefClasses)
         {
             Debug.Log("external keys resolved: " + externParametersKey[x].ToString());
+            Debug.Log("with external class reference: " + externParametersRefClasses[x].GetType().Name);
+            Debug.Log("to parameter " + externParametersKey[x].ToString());
             ex.Parameters[externParametersKey[x].ToString()] = resolvedValsExternal[x];
             x++;
         }
@@ -229,6 +234,7 @@ public abstract class AbstractEffect
         target.AttachEffect(this);
     }
 
+
     /// <summary>
     /// define here the activation logic of the effect.
     /// to apply the effect call <see cref="DoEffect"/> method.
@@ -238,20 +244,4 @@ public abstract class AbstractEffect
     /// TODO: potrei voler levare target come parametro per impedire a chi scrive gli effetti di fare cose strane
     public abstract float? Activate(AbstractStatus target);
 
-    public new string ToString()
-
-    {
-        string toret = "Effect ID: " + ID + "\n";
-        toret += "Target class ID: " + localTargetClassID + "\n";
-        toret += "Target attribute ID: " + targetAttributeID + "\n";
-        toret += "Expression: " + ex.ToString() + "\n";
-        toret += "Parameters: \n";
-
-        foreach (var param in localParametersRef)
-        {
-            toret += param[0] + "." + param[1] + "\n";
-        }
-
-        return toret;
-    }
 }

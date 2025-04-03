@@ -50,7 +50,7 @@ public class Bullet : MonoBehaviour
                 try
                 {
                     Debug.Log("Dispatching effects to " + col.gameObject.name);
-                    d.ItemDispatchFromExternalSource(bulletState.bulletEffets);
+                    d.DispatchFromExternalSource(bulletState.bulletEffets);
                 }
                 catch (Exception e)
                 {
