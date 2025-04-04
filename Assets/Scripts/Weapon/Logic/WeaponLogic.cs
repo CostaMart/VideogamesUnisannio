@@ -66,7 +66,6 @@ namespace Weapon.State
         }
         void Update()
         {
-
             Debug.DrawLine(transform.position, transform.position + muzzle.forward * 100, Color.blue);
         }
 

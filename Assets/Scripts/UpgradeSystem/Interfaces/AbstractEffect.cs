@@ -2,11 +2,8 @@ using NCalc;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.Rendering.HighDefinition;
 
 /// <summary>
 /// Implement this to participate to the upgrade system and define your own effects
@@ -18,8 +15,6 @@ public abstract class AbstractEffect
 
     protected EffectsDispatcher dispatcher;
 
-    public int name { get; private set; }
-
     /// <summary>
     /// expression to compute new vals from this effect.
     /// It is already in its compiled form, so it is not necessary to compile it again.
@@ -27,17 +22,37 @@ public abstract class AbstractEffect
     public Expression ex;
 
     /// <summary>
-    /// This is the list of parameters translated into index from the 'expr' string of the json effect
+    /// This is the list of parameters translated into index from the 'expr' string of the json effect (only local,
+    /// the ones with @ before)
     /// </summary>
     public int[][] localParametersRef;
 
+    /// <summary>
+    /// This is the list of parameters translated into index from the 'expr' string of the json effect (only external,
+    /// the ones with ! before)
+    /// </summary>
+    public int[][] externParametersRef;
+    
+    /// <summary>
+    /// This will contain references to the objects resolved by dispatcher, this effect can use this references
+    /// to resolve values he needs on activation.
+    /// </summary>
     public AbstractStatus[] localParametersRefClasses = new AbstractStatus[0];
 
+    /// <summary>
+    /// This will contain references to the objects resolved by dispatcher, this effect can use this references
+    /// to resolve values he needs on activation.
+    /// </summary>
     public AbstractStatus[] externParametersRefClasses = new AbstractStatus[0];
 
+    /// <summary>
+    /// parameters key used in the ex for local references
+    /// </summary>
     public char[] localParametersKey;
 
-    public int[][] externParametersRef;
+    /// <summary>
+    /// parameters key used in the ex for external references
+    /// </summary>
     public char[] externParametersKey;
 
     /// <summary>
@@ -73,7 +88,7 @@ public abstract class AbstractEffect
 
 
         // search for parameters to resolve locally
-        MatchCollection matches = Regex.Matches(data["expr"], @"@\w+\.\d+");
+        MatchCollection internalRefs = Regex.Matches(data["expr"], @"@\w+\.\d+");
         MatchCollection external = Regex.Matches(data["expr"], @"!\w+\.\d+");
 
         if (targetClassString.Contains("@"))
@@ -89,7 +104,7 @@ public abstract class AbstractEffect
 
 
         char c = 'A';
-        int len = matches.Count;
+        int len = internalRefs.Count;
         localParametersRef = new int[len][];
         localParametersKey = new char[len];
         Debug.Log("this is the numebr of local parameters " + len + "for item " + itemID);
@@ -105,7 +120,7 @@ public abstract class AbstractEffect
         // cerchiamo nella stringa tutti i riferimenti a variabili di altre classi, nel caso se ne trovino vengono sostituite con un ID alfabetico nella stringa dell'espression
         // contemporaneamente il nome viene tradotto in ID numerico e inserito nell'array dei riferimenti da risolvere. I valori vengono risolti 
         // ad ogni invocazione di DoEffect in modo che siano sempre aggiornati
-        foreach (var match in matches)
+        foreach (var match in internalRefs)
         {
             s = s.Replace(match.ToString(), c.ToString());
             string laClass = match.ToString().Split('.')[0].Substring(1);
@@ -147,12 +162,7 @@ public abstract class AbstractEffect
                 }
             }
         }
-
-        Debug.Log("for item " + itemID + " this is the expression: " + s);
-        Debug.Log("this are local parameters: " + localParametersRef.Length);
-        Debug.Log("this are external parameters: " + externParametersRef.Length);
-
-
+        
         ex = new Expression(s);
     }
 
@@ -184,19 +194,9 @@ public abstract class AbstractEffect
             ex.Parameters[externParametersKey[x].ToString()] = resolvedValsExternal[x];
             x++;
         }
-
-
-        try
-        {
-            var returnable = Convert.ToSingle(ex.Evaluate());
-            return returnable;
-        }
-        catch (Exception e)
-        {
-            Debug.LogError("Error in expression evaluation: " + e.Message);
-        }
-
-        return 0;
+        
+        var returnable = Convert.ToSingle(ex.Evaluate());
+        return returnable;
     }
 
     private object[] resolveValues(AbstractStatus[] statusClass, int[][] paramIndexes)

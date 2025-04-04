@@ -13,7 +13,7 @@ namespace Weapon.State
         [SerializeField] public bool destroyOnHit = true;
         
         public Item bulletEffets;
-
+        
         public float directionx;
         public float directiony;
         public float directionz;
@@ -23,8 +23,13 @@ namespace Weapon.State
 
         new void Awake()
         {
+            
             base.Awake();
             rb = GetComponent<Rigidbody>();
+        }
+
+        new void AttachEffect()
+        {
         }
 
         new void Update()

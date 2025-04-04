@@ -6,8 +6,8 @@
             "effects": [
                 {
                     "effectType": "sa",
-                    "target": "@PhysicalState.1",
-                    "expr": "false"
+                    "target": "!CharStats.1",
+                    "expr": "!CharStats.1 - 10"
                 }
             ]
         }

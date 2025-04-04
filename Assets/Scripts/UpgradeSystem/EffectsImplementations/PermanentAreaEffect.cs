@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UpgradeSystem.Interfaces;
 
-public class PermanentAreaEffect : AbstractEffect
+public class PermanentAreaEffect : AreaEffect 
 {
     private SingleActivationEffect effectToDeploy;
     private float rate;
@@ -22,17 +23,12 @@ public class PermanentAreaEffect : AbstractEffect
         this.localParametersRefClasses = effectToDeploy.localParametersRefClasses;
     }
 
-    public override float? Activate(AbstractStatus target)
-    {
-        throw new System.NotImplementedException();
-    }
-
     public override void Attach(Dictionary<int, AbstractStatus> target, EffectsDispatcher dispatcher)
     {
         dispatcher.toExternalDispatchArea.Add(this);
     }
 
-    public SingleActivationEffect GetEffectToDeploy(PlayerEffectDispatcher dispatcher)
+    public override SingleActivationEffect GetEffectToDeploy(PlayerEffectDispatcher dispatcher)
     {
         elapsedFromLastActivation += Time.deltaTime;
 

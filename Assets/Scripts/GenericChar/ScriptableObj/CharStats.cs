@@ -5,7 +5,6 @@ using UnityEngine;
 public class CharStats : AbstractStatus
 {
 
-    private delegate float Command(float op1, float op2);
     [SerializeField] private float rotationSpeed = 0.5f;
     [SerializeField] private float life = 100;
     [SerializeField] private float aimRotationSpeed = 5f;
@@ -28,5 +27,16 @@ public class CharStats : AbstractStatus
     protected override int ComputeID()
     {
         return ItemManager.statClassToIdRegistry[this.GetType().Name];
+    }
+
+    new void Update()
+    {
+        base.Update();
+        
+        if (life <= 0)
+        {
+            Debug.Log("im dead");
+            this.gameObject.SetActive(false);
+        }
     }
 }

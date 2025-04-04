@@ -20,7 +20,7 @@ public class Bullet : MonoBehaviour
     {
         c = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
-        bulletState = transform.GetComponent<BulletState>();
+        bulletState = transform.parent.GetComponent<BulletState>();
         initialPos = transform.position;
     }
 

@@ -24,21 +24,12 @@ public class NPCDispatcher : EffectsDispatcher
         PlayerEffectDispatcher.dispatchers.Remove(this);
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            Debug.Log("this is active :" + activeEffects.Count);
-        }
-    }
-
     public override void DispatchFromOtherDispatcher(AbstractEffect up)
     {
-        if (activeEffects.ContainsKey(up.ID))
-        {
-            return;
-        }
+        if(up == null) return;
+        if (activeEffects.ContainsKey(up.ID)) return;
 
+        // useful to keep in check which effects are already active
         activeEffects.Add(up.ID, up);
         up.containedIn.Add(activeEffects);
         up.externParametersRefClasses = resolveReferences(up.externParametersRef);

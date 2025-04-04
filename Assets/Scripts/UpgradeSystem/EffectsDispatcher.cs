@@ -33,8 +33,6 @@ public abstract class EffectsDispatcher : MonoBehaviour
     /// </summary>
     public void ItemDispatch(Item it)
     {
-        Debug.Log("Dispatching bullet effect " + it.ToString());
-
         if (it.bullet)
         {
             foreach (var effect in it.effects)
@@ -49,7 +47,6 @@ public abstract class EffectsDispatcher : MonoBehaviour
 
         foreach (AbstractEffect up in it.effects)
         {
-            Debug.Log("Dispatching effect " + up.ToString());
             up.localParametersRefClasses = resolveReferences(up.localParametersRef);
             up.Attach(affectables, this);
         }
