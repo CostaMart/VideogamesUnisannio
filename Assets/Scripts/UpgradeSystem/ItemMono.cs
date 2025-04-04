@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 public class ItemMono : MonoBehaviour
@@ -7,8 +8,8 @@ public class ItemMono : MonoBehaviour
 
     void OnCollisionStay(Collision collision)
     {
-        Debug.Log("item raccolto dal giocatore : " + item.id);
-        Debug.Log("item raccolto dal giocatore : " + item.name);
+        collision.gameObject.GetComponent<PlayerEffectDispatcher>().ItemDispatch(item);
+        Debug.Log("bullet dispatched");
     }
 
 }

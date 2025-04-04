@@ -8,12 +8,28 @@ using UnityEngine;
 public class SingleActivationEffect : AbstractEffect
 {
 
-  public SingleActivationEffect(Dictionary<string, string> data, int itemID, int effectID, bool inABullet) : base(data, itemID, inABullet) { }
+  public SingleActivationEffect(Dictionary<string, string> data, int itemID, int effectID, bool inABullet) : base(data,
+    itemID, inABullet)
+  {
+  }
+
   public override float? Activate(AbstractStatus target)
   {
     var result = base.DoEffect();
+    DetachEffect();
     target.RemoveEffect(this);
     return result;
+  }
+  public override void Attach(Dictionary<int, AbstractStatus> target, EffectsDispatcher dispatcher)
+  {
+    this.dispatcher = dispatcher;
+
+    if (localTargetClassID != -1)
+    {
+      target[this.localTargetClassID].AttachEffect(this);
+      return;
+    }
+    target[this.externalTargetClassID].AttachEffect(this);  
   }
 
 }

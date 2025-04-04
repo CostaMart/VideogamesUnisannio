@@ -50,7 +50,7 @@ public class Bullet : MonoBehaviour
                 try
                 {
                     Debug.Log("Dispatching effects to " + col.gameObject.name);
-                    d.DispatchFromExternalSource(bulletState.bulletEffets);
+                    d.DispatchFromOtherDispatcher(bulletState.bulletEffets);
                 }
                 catch (Exception e)
                 {
@@ -66,7 +66,6 @@ public class Bullet : MonoBehaviour
 
     void resetItem()
     {
-        Debug.Log("Resetting bullet");
         rb.linearVelocity = Vector3.zero; // Azzeriamo la velocità lineare
         rb.angularVelocity = Vector3.zero; // Azzeriamo la velocità angolare
         transform.position = initialPos; // Riportiamo il proiettile alla posizione iniziale

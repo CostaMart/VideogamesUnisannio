@@ -11,6 +11,7 @@ namespace Weapon.State
         [SerializeField] public float baseMass = 2;
         [SerializeField] public float explosionRadius = 2;
         [SerializeField] public bool destroyOnHit = true;
+        
         public Item bulletEffets;
 
         public float directionx;
@@ -28,9 +29,7 @@ namespace Weapon.State
 
         new void Update()
         {
-
             base.Update();
-
             directionx = transform.forward.x;
             directiony = transform.forward.y;
             directionz = transform.forward.z;

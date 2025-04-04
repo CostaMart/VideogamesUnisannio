@@ -40,7 +40,7 @@ public class MovementLogic : MonoBehaviour
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
 
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = 120;
     }
 
 

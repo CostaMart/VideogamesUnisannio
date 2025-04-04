@@ -52,5 +52,9 @@ class OverTimeEffect : AbstractEffect
 
         return result;
     }
-
+    public override void Attach(Dictionary<int, AbstractStatus> target, EffectsDispatcher dispatcher)
+    {
+        this.dispatcher = dispatcher;
+        target[localTargetClassID].AttachEffect(this);
+    }
 }

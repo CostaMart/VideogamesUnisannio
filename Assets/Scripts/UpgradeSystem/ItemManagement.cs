@@ -60,6 +60,7 @@ public class ItemManager
         // Accesso ai dati
         Item i = null;
         Dictionary<int, Item> items = new Dictionary<int, Item>();
+        
 
         try
         {
@@ -88,6 +89,10 @@ public class ItemManager
 
                         case "ot":
                             e = new OverTimeEffect(effect, item.id, effectID, isbullet);
+                            break;
+
+                        case "area":
+                            e = new PermanentAreaEffect(effect, item.id, effectID, isbullet);
                             break;
 
                         default:

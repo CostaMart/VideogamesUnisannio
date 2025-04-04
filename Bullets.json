@@ -1,13 +1,12 @@
 {
     "items": [
         {
-            "id": 3,
+            "id": 0,
             "name": "Bullet 1",
             "effects": [
                 {
-                    "targetType": "area",
                     "effectType": "sa",
-                    "target": "!PhysicalState.1",
+                    "target": "@PhysicalState.1",
                     "expr": "false"
                 }
             ]

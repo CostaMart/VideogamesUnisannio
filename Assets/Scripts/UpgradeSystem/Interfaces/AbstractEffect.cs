@@ -1,5 +1,6 @@
 using NCalc;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,9 +13,10 @@ using UnityEngine.Rendering.HighDefinition;
 /// </summary>
 public abstract class AbstractEffect
 {
+    public List<IDictionary> containedIn = new List<IDictionary>();
     public int ID;
 
-    private EffectsDispatcher dispatcher;
+    protected EffectsDispatcher dispatcher;
 
     public int name { get; private set; }
 
@@ -170,24 +172,15 @@ public abstract class AbstractEffect
         resolvedValsExternal = resolveValues(externParametersRefClasses, externParametersRef);
 
         var x = 0;
-        Debug.Log("intrnal keys available: " + localParametersKey.Length);
-        Debug.Log("internal classes reference available: " + localParametersRefClasses.Length);
         foreach (var reference in localParametersRefClasses)
         {
-            Debug.Log("internal keys resolved: " + localParametersKey[x].ToString());
             ex.Parameters[localParametersKey[x].ToString()] = resolvedValsLocal[x];
             x++;
         }
 
         x = 0;
-        Debug.Log("external keys available: " + externParametersKey.Length);
-        Debug.Log("external classes reference available: " + externParametersRefClasses.Length);
-        Debug.Log("this is the expression: " + ex.ToString());
         foreach (var reference in externParametersRefClasses)
         {
-            Debug.Log("external keys resolved: " + externParametersKey[x].ToString());
-            Debug.Log("with external class reference: " + externParametersRefClasses[x].GetType().Name);
-            Debug.Log("to parameter " + externParametersKey[x].ToString());
             ex.Parameters[externParametersKey[x].ToString()] = resolvedValsExternal[x];
             x++;
         }
@@ -196,8 +189,6 @@ public abstract class AbstractEffect
         try
         {
             var returnable = Convert.ToSingle(ex.Evaluate());
-            Debug.Log("expression computed : " + ex.ToString() + " for item " + ID);
-
             return returnable;
         }
         catch (Exception e)
@@ -210,7 +201,6 @@ public abstract class AbstractEffect
 
     private object[] resolveValues(AbstractStatus[] statusClass, int[][] paramIndexes)
     {
-        Debug.Log("resolving values for " + statusClass.GetType().Name + " parameters");
         var x = 0;
         object[] resolved = new object[statusClass.Length];
 
@@ -228,11 +218,7 @@ public abstract class AbstractEffect
     /// </summary>
     /// <param name="target"></param>
     /// <param name="dispatcher"></param>
-    public void Attach(AbstractStatus target, EffectsDispatcher dispatcher)
-    {
-        this.dispatcher = dispatcher;
-        target.AttachEffect(this);
-    }
+    public abstract void Attach(Dictionary<int,AbstractStatus> target, EffectsDispatcher dispatcher);
 
 
     /// <summary>
@@ -243,5 +229,14 @@ public abstract class AbstractEffect
     /// </summary>
     /// TODO: potrei voler levare target come parametro per impedire a chi scrive gli effetti di fare cose strane
     public abstract float? Activate(AbstractStatus target);
+
+    protected void DetachEffect()
+    {
+        foreach (var l in containedIn)
+        {
+            l.Remove(this.ID);
+        }
+
+    }
 
 }

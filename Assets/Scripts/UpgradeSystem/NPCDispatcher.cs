@@ -13,23 +13,35 @@ using static ItemManager;
 /// </summary>
 public class NPCDispatcher : EffectsDispatcher
 {
-    void OnTriggerEnter(Collider collision)
+    Dictionary<int, AbstractEffect> activeEffects = new Dictionary<int, AbstractEffect>();
+    void OnTriggerStay(Collider collision)
     {
-
-        if (collision.TryGetComponent<PlayerEffectDispatcher>(out PlayerEffectDispatcher disp))
-        {
-            Debug.Log("Adding dispatcher " + disp.ToString());
-            disp.dispatchers.Add(this);
-        }
-
+        PlayerEffectDispatcher.dispatchers.Add(this);
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.TryGetComponent<PlayerEffectDispatcher>(out PlayerEffectDispatcher disp))
+        PlayerEffectDispatcher.dispatchers.Remove(this);
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            disp.dispatchers.Remove(this);
+            Debug.Log("this is active :" + activeEffects.Count);
+        }
+    }
+
+    public override void DispatchFromOtherDispatcher(AbstractEffect up)
+    {
+        if (activeEffects.ContainsKey(up.ID))
+        {
+            return;
         }
 
+        activeEffects.Add(up.ID, up);
+        up.containedIn.Add(activeEffects);
+        up.externParametersRefClasses = resolveReferences(up.externParametersRef);
+        up.Attach(affectables, this);
     }
 }

@@ -5,9 +5,10 @@
             "name": "Jump High",
             "effects": [
                 {
-                    "effectType": "sa",
-                    "target": "@CharStats.6",
-                    "expr": "120"
+                    "effectType": "area",
+                    "rate": 1,
+                    "target": "!PhysicalState.0",
+                    "expr": "@CharStats.0"
                 }
             ]
         }

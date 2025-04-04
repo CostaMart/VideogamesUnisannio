@@ -15,8 +15,9 @@ using static ItemManager;
 public class PlayerEffectDispatcher : EffectsDispatcher
 {
 
-    public List<EffectsDispatcher> dispatchers = new List<EffectsDispatcher>();
+    public static List<EffectsDispatcher> dispatchers = new List<EffectsDispatcher>();
     private List<EffectsDispatcher> toRemovesDisp = new List<EffectsDispatcher>();
+    private List<PermanentAreaEffect> toExternalDispatchAreaRemove = new List<PermanentAreaEffect>();
 
 
     void OnTriggerEnter(Collider collision)
@@ -25,12 +26,6 @@ public class PlayerEffectDispatcher : EffectsDispatcher
         {
             ItemDispatch(collision.gameObject.GetComponent<ItemMono>().item);
         }
-
-        if (collision.TryGetComponent<EffectsDispatcher>(out EffectsDispatcher disp))
-        {
-            dispatchers.Add(disp);
-        }
-
     }
 
     void OnTriggerExit(Collider other)
@@ -44,20 +39,12 @@ public class PlayerEffectDispatcher : EffectsDispatcher
 
     void Update()
     {
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                this.ItemDispatch(ItemManager.bulletPool[3]);
-            }
-
-
 
             foreach (var effect in toExternalDispatchArea)
             {
                 foreach (var disp in dispatchers)
                 {
-                    Debug.Log("dhispatcing to external source " + effect.ToString());
-                    disp.DispatchFromExternalSource(effect);
+                    disp.DispatchFromOtherDispatcher(effect.GetEffectToDeploy(this));
                     toRemovesDisp.Add(disp);
                 }
             }
@@ -68,8 +55,13 @@ public class PlayerEffectDispatcher : EffectsDispatcher
             }
 
             toRemovesDisp.Clear();
-        }
+            toExternalDispatchAreaRemove.Clear();
 
+    }
+
+    public void RemoveFromAreaEffects(PermanentAreaEffect effect)
+    {
+        toExternalDispatchAreaRemove.Add(effect);
     }
 
 

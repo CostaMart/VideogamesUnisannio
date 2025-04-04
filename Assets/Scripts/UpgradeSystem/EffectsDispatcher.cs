@@ -12,9 +12,9 @@ using static ItemManager;
 public abstract class EffectsDispatcher : MonoBehaviour
 {
 
-    [SerializeField] Dictionary<int, AbstractStatus> affectables = new Dictionary<int, AbstractStatus>();
+    [SerializeField] protected Dictionary<int, AbstractStatus> affectables = new Dictionary<int, AbstractStatus>();
     [SerializeField] private ControlEventManager controlEventManager;
-    protected List<AbstractEffect> toExternalDispatchArea = new List<AbstractEffect>();
+    public List<PermanentAreaEffect> toExternalDispatchArea = new List<PermanentAreaEffect>();
 
 
 
@@ -39,7 +39,7 @@ public abstract class EffectsDispatcher : MonoBehaviour
         {
             foreach (var effect in it.effects)
             {
-                effect.localParametersRefClasses = attachReferences(effect.localParametersRef);
+                effect.localParametersRefClasses = resolveReferences(effect.localParametersRef);
             }
 
             WeaponState b = (WeaponState)affectables[4];
@@ -50,36 +50,25 @@ public abstract class EffectsDispatcher : MonoBehaviour
         foreach (AbstractEffect up in it.effects)
         {
             Debug.Log("Dispatching effect " + up.ToString());
-            up.localParametersRefClasses = attachReferences(up.localParametersRef);
-
-            if (up.localTargetClassID == -1)
-            {
-                Debug.Log("attaching for external deploy");
-                toExternalDispatchArea.Add(up);
-                continue;
-            }
-
-            up.Attach(affectables[up.localTargetClassID], this);
+            up.localParametersRefClasses = resolveReferences(up.localParametersRef);
+            up.Attach(affectables, this);
         }
     }
 
-    public void DispatchFromExternalSource(Item it)
+    public virtual void DispatchFromOtherDispatcher(Item it)
     {
         foreach (AbstractEffect up in it.effects)
         {
             Debug.Log("Dispatching external effect " + up.ToString());
-
-            up.externParametersRefClasses = attachReferences(up.externParametersRef);
-            up.Attach(affectables[up.externalTargetClassID], this);
-
+            up.externParametersRefClasses = resolveReferences(up.externParametersRef);
+            up.Attach(affectables, this);
         }
     }
 
-    public void DispatchFromExternalSource(AbstractEffect up)
+    public virtual void DispatchFromOtherDispatcher(AbstractEffect up)
     {
-        up.externParametersRefClasses = attachReferences(up.externParametersRef);
-        Debug.Log("this is external target " + up.externalTargetClassID);
-        up.Attach(affectables[up.externalTargetClassID], this);
+        up.externParametersRefClasses = resolveReferences(up.externParametersRef);
+        up.Attach(affectables, this);
     }
 
     /// <summary>
@@ -87,15 +76,12 @@ public abstract class EffectsDispatcher : MonoBehaviour
     /// <paramref name="calssID"/> the ID of the class to reference
     /// <paramref name="attributeID"/> the ID of the attribute to reference
     /// </summary>
-    public AbstractStatus[] attachReferences(int[][] references)
+    public AbstractStatus[] resolveReferences(int[][] references)
     {
         AbstractStatus[] toret = new AbstractStatus[references.Length];
+        
         int x = 0;
-
-        Debug.Log("following the list of references to resolve");
-        foreach (var refere in references)
-            Debug.Log("id :" + refere[0]);
-
+        
         foreach (var refere in references)
         {
             try
