@@ -12,9 +12,7 @@ public class ControlEventManager : ScriptableObject
     private UnityAction OnFire;
     private UnityAction OnReload;
     private UnityAction<bool> Ragdoll;
-
-    private UnityAction<Vector2> OnMouseControl;
-
+    private UnityAction<Vector2> OnMouseControl; 
     public void AddListenerAiming(UnityAction<bool> listener)
     {
         OnAiming += listener;

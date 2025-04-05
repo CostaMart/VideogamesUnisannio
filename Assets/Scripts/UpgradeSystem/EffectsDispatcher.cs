@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Weapon.State;
 using static ItemManager;
 
 /// <summary>
@@ -14,6 +15,10 @@ public abstract class EffectsDispatcher : MonoBehaviour
 
     [SerializeField] protected Dictionary<int, AbstractStatus> affectables = new Dictionary<int, AbstractStatus>();
     [SerializeField] private ControlEventManager controlEventManager;
+
+    [SerializeField] private BulletPoolState bulletPoolPrimary;
+    [SerializeField] private BulletPoolState bulletPoolPoolSecondary;
+
     public List<PermanentAreaEffect> toExternalDispatchArea = new List<PermanentAreaEffect>();
 
 
@@ -22,6 +27,14 @@ public abstract class EffectsDispatcher : MonoBehaviour
     void Start()
     {
         new ItemManager();
+
+        // register the dispatcher for dipsatching effects
+        if (bulletPoolPrimary != null)
+            this.affectables.Add(bulletPoolPrimary.ID, bulletPoolPrimary);
+
+        if (bulletPoolPoolSecondary != null)
+            this.affectables.Add(bulletPoolPoolSecondary.ID, bulletPoolPoolSecondary);
+
         FindComponentsInChildren<AbstractStatus>(transform);
     }
 
@@ -40,8 +53,6 @@ public abstract class EffectsDispatcher : MonoBehaviour
                 effect.localParametersRefClasses = resolveReferences(effect.localParametersRef);
             }
 
-            WeaponState b = (WeaponState)affectables[4];
-            b.bulletEffects = it;
             return;
         }
 
@@ -76,9 +87,9 @@ public abstract class EffectsDispatcher : MonoBehaviour
     public AbstractStatus[] resolveReferences(int[][] references)
     {
         AbstractStatus[] toret = new AbstractStatus[references.Length];
-        
+
         int x = 0;
-        
+
         foreach (var refere in references)
         {
             try
@@ -88,7 +99,9 @@ public abstract class EffectsDispatcher : MonoBehaviour
             }
             catch (KeyNotFoundException e)
             {
-                Debug.LogError("Class ID " + refere[0] + " not found in the dispatcher of object " + transform.name + " with ID: " + refere[1]);
+                Debug.LogError("status with ID " + refere[0] + " not found in the dispatcher of object " +
+                 transform.name + " with ID: " + refere[1] + " this might be normal");
+
                 x++;
             }
             catch (Exception e)

@@ -13,6 +13,7 @@ public class ItemManager
     public List<AbstractEffect> effects;
     public static Dictionary<string, int> statClassToIdRegistry;
     public bool added = false;
+
     public static Dictionary<int, Item> globalItemPool = new Dictionary<int, Item>(); /// this contains all the items created by the game from the JSON file
     public static Dictionary<int, Item> bulletPool = new Dictionary<int, Item>(); /// this contains all the items created by the game from the JSON file 
 
@@ -24,10 +25,11 @@ public class ItemManager
             { "CharStats", 0},
             { "testUpdate", 1 },
             { "Ragdoller",  2 },
-            { "PrimaryWeaponState", 3},
+            {"PrimaryWeaponState", 3},
             {"SecondaryWeaponState", 4},
-            {"BulletState",5},
-            {"PhysicalState", 6}
+            {"BulletPoolStatePrimary",5},
+            {"BulletPoolStateSecondary", 6},
+            {"PhysicalState", 7}
         };
 
         globalItemPool = ComputeAllItems("/home/costamh/HeroDivers/ItemList.json", false);
@@ -60,7 +62,7 @@ public class ItemManager
         // Accesso ai dati
         Item i = null;
         Dictionary<int, Item> items = new Dictionary<int, Item>();
-        
+
 
         try
         {

@@ -1,10 +1,11 @@
 using System;
 using System.Data;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Weapon.State;
 using static ItemManager;
 
-public class Bullet : MonoBehaviour
+public class Bullet : AbstractStatus
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private Vector3 initialPos;
@@ -12,7 +13,11 @@ public class Bullet : MonoBehaviour
     private Collider c;
 
 
-    [SerializeField] private BulletState bulletState;
+
+    public Item bulletEffets;
+
+    public BulletPoolState bulletPoolState;
+
     private float EnableTime;
 
 
@@ -20,20 +25,28 @@ public class Bullet : MonoBehaviour
     {
         c = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
-        bulletState = transform.parent.GetComponent<BulletState>();
         initialPos = transform.position;
     }
 
-    void Update()
+    protected override int ComputeID()
     {
-        if (rb.linearVelocity != Vector3.zero)
+        return -1;
+    }
+
+    new void Update()
+    {
+
+        if (EnableTime > 5)
         {
-            EnableTime += Time.deltaTime;
-            if (EnableTime > 5)
-            {
-                EnableTime = 0;
-                resetItem();
-            }
+            EnableTime = 0;
+            resetItem();
+        }
+
+        if (bulletPoolState.dirty)
+        {
+            transform.localScale = new Vector3(bulletPoolState.widthScale, bulletPoolState.heightScale,
+            bulletPoolState.lengthScale);
+            rb.mass = bulletPoolState.baseMass;
         }
     }
 
@@ -42,15 +55,15 @@ public class Bullet : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         Debug.Log("Bullet colliding with " + collision.gameObject.name);
-        Collider[] colliders = Physics.OverlapSphere(collision.transform.position, bulletState.explosionRadius);
+        Collider[] colliders = Physics.OverlapSphere(collision.transform.position, bulletPoolState.explosionRadius);
+
         foreach (Collider col in colliders)
         {
             if (col.TryGetComponent<EffectsDispatcher>(out var d))
             {
                 try
                 {
-                    Debug.Log("Dispatching effects to " + col.gameObject.name);
-                    d.DispatchFromOtherDispatcher(bulletState.bulletEffets);
+                    d.DispatchFromOtherDispatcher(bulletPoolState.bulletEffects);
                 }
                 catch (Exception e)
                 {
@@ -59,7 +72,7 @@ public class Bullet : MonoBehaviour
             }
         }
 
-        if (bulletState.destroyOnHit)
+        if (bulletPoolState.destroyOnHit)
             resetItem();
     }
 

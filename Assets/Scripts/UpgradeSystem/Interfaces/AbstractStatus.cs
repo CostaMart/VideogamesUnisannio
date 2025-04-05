@@ -13,6 +13,8 @@ public abstract class AbstractStatus : MonoBehaviour
 
     private List<AbstractEffect> activeEffects = new List<AbstractEffect>();
 
+    public bool dirty = false;
+
     private List<AbstractEffect> effectsToRemove = new List<AbstractEffect>();
 
     /// <summary>
@@ -21,6 +23,7 @@ public abstract class AbstractStatus : MonoBehaviour
     public int ID { get; private set; }
 
     protected abstract int ComputeID();
+
 
     protected void Update()
     {
@@ -57,6 +60,7 @@ public abstract class AbstractStatus : MonoBehaviour
     public void SetStatByID(int id, object newValue)
     {
         fields[id].SetValue(this, Convert.ChangeType(newValue, fields[id].FieldType));
+        dirty = true;
     }
 
     /// <summary>

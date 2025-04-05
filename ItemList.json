@@ -5,10 +5,9 @@
             "name": "Jump High",
             "effects": [
                 {
-                    "effectType": "area",
-                    "rate": 1,
-                    "target": "!PhysicalState.0",
-                    "expr": "@CharStats.0"
+                    "effectType": "sa",
+                    "target": "@BulletPoolStatePrimary.9",
+                    "expr": "100"
                 }
             ]
         }
