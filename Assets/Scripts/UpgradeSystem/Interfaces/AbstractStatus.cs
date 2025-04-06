@@ -25,7 +25,7 @@ public abstract class AbstractStatus : MonoBehaviour
     protected abstract int ComputeID();
 
 
-    protected void Update()
+    protected virtual void Update()
     {
         this.ActivateEffects();
 
@@ -37,13 +37,12 @@ public abstract class AbstractStatus : MonoBehaviour
         effectsToRemove.Clear();
     }
 
-    public void Awake()
+    protected virtual void Awake()
     {
         Debug.Log("Assigning ID to status class " + this.GetType().Name);
         ID = ComputeID();
         new ItemManager();
         Type type = this.GetType();
-        Debug.Log("Type: " + type);
         fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         foreach (var field in fields)
@@ -83,7 +82,7 @@ public abstract class AbstractStatus : MonoBehaviour
     /// Attach an effect to this status class.
     /// </summary>
     /// <param name="effect"></param>
-    public void AttachEffect(AbstractEffect effect)
+    public virtual void AttachEffect(AbstractEffect effect)
     {
         this.activeEffects.Add(effect);
     }
@@ -92,7 +91,7 @@ public abstract class AbstractStatus : MonoBehaviour
     /// Remove an effect from this status class.
     /// </summary>
     /// <param name="effect"></param>
-    public void RemoveEffect(AbstractEffect effect)
+    public virtual void RemoveEffect(AbstractEffect effect)
     {
         this.effectsToRemove.Add(effect);
     }
@@ -100,7 +99,7 @@ public abstract class AbstractStatus : MonoBehaviour
     /// <summary>
     /// Activate effect in the effect list
     /// </summary>
-    protected void ActivateEffects()
+    protected virtual void ActivateEffects()
     {
         foreach (var ef in activeEffects)
         {

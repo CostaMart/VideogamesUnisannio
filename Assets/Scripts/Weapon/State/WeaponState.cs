@@ -1,68 +1,73 @@
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor.EditorTools;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Weapon.State;
-using static ItemManager;
 
 public class WeaponState : AbstractStatus
 {
 
-    [SerializeField] private float baseMagSize;
 
-    [SerializeField] public bool automatic = false;
+    [HideInInspector] public GameObject[] bulletPool;
+    [HideInInspector] public Rigidbody[] bulletRigids;
+    [HideInInspector] public bool reloading = false;
 
-    [SerializeField] private float baseFireRate;
-
-    [SerializeField] private bool isPrimary = true; // 0 = primary, 1 = secondary
-
-    public BulletPoolState pool;
-    public GameObject[] bulletPool;
-    public Rigidbody[] bulletRigids;
-
-    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] public GameObject bulletPrefab;
 
     // the bullet will be fired from this muzzle position and go in the direction of the transform.forward
+    [Header("Weapon Stats")]
     [Tooltip("the bullet will be fired from this muzzle position and go in the direction it is pointing")]
     [SerializeField] public int magCount;
     public int magSize = 1;
     public float fireRate;
-    public float FireRate => fireRate;
-    public bool reloading = false;
     public float fireStrength = 1f;
+    public int laserType;
+    public float laserThickness = 0.1f;
+    public float laserLength = 10f;
+    public LayerMask laserMask;
+
+    [SerializeField] public bool automatic = false;
+    [SerializeField] private bool isPrimary = true; // 0 = primary, 1 = secondary
+    [SerializeField] private Material[] laserMaterial;
+
+    [Header("Weapon Logic")]
+    [Tooltip("list of wepon logics this wepon can use")]
+    public BulletPoolState pool;
+    [SerializeField] private List<AbstractWeaponLogic> weaponLogics;
+    public int activeLogicIndex = 0;
+    [HideInInspector] public AbstractWeaponLogic activeLogic;
+    [HideInInspector] public WeaponBehaviourContainer weaponContrainer;
+    public ControlEventManager controlEventManager;
+    public PlayerInput inputSys;
+    [SerializeField] public Transform muzzle;
+    [HideInInspector] public LineRenderer lineRenderer;
+
 
     // Update is called once per frame
-    void Update()
+    protected override void Awake()
+    {
+        base.Awake();
+        weaponContrainer = GetComponent<WeaponBehaviourContainer>();
+        lineRenderer = muzzle.gameObject.GetComponent<LineRenderer>();
+        lineRenderer.material = laserMaterial[laserType];
+        lineRenderer.startWidth = laserThickness;
+
+        Debug.Log("container found and assigned");
+        ReassingLogic();
+    }
+
+    protected override void Update()
     {
         base.Update();
-        if (bulletPool.Length < magCount * magSize)
+
+        if (dirty)
         {
-            if (bulletPool != null)
-            {
-                var newPool = new GameObject[magCount * magSize];
-                int i = 0;
-
-                foreach (GameObject bullet in bulletPool)
-                {
-                    newPool[i] = bullet;
-                    i++;
-                }
-
-                bulletPool = newPool;
-                bulletRigids = new Rigidbody[newPool.Length];
-
-                for (int index = i; index < bulletPool.Length; index++)
-                {
-                    bulletPool[index] = Instantiate(bulletPrefab, pool.transform);
-                    bulletPool[index].GetComponent<Bullet>().bulletPoolState = pool;
-                    bulletRigids[index] = bulletPool[index].GetComponent<Rigidbody>();
-                    bulletPool[index].transform.position = pool.transform.position;
-                    bulletPool[index].SetActive(false);
-                }
-            }
+            ReassingLogic();
+            lineRenderer.material = laserMaterial[laserType];
+            lineRenderer.startWidth = laserThickness;
+            dirty = false;
         }
-
-        if (fireRate < baseFireRate)
-            fireRate = baseFireRate;
     }
 
     protected override int ComputeID()
@@ -77,5 +82,13 @@ public class WeaponState : AbstractStatus
             Debug.Log("Secondary weapon state");
             return ItemManager.statClassToIdRegistry["SecondaryWeaponState"];
         }
+    }
+
+    public void ReassingLogic()
+    {
+        weaponContrainer.activeLogic = weaponLogics[activeLogicIndex];
+        weaponContrainer.activeLogic.SetWeaponState(this);
+        weaponContrainer.activeLogic.Enable();
+        Debug.Log("logic correctly assigned");
     }
 }

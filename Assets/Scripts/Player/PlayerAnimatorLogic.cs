@@ -139,7 +139,7 @@ public class PlayerAnimatorLogic : MonoBehaviour
     }
 
     // Update is called once per frame
-    void LateUpdate()
+    void Update()
     {
 
         // se  stiamo mirando spostiamo l'arma nella posizione di mira, si controlla lastwas per non farlo ripetutamente

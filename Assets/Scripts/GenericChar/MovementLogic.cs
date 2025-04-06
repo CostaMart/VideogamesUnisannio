@@ -1,4 +1,5 @@
 
+using System.Numerics;
 using Unity.Cinemachine;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
@@ -69,7 +70,9 @@ public class MovementLogic : MonoBehaviour
             // rotazione basata sulla direzione della telecamera, se stiamo mirando
             Vector3 q = camera.transform.forward;
             q.y = 0;
-            transform.forward = Vector3.Lerp(transform.forward, q, playerSettings.AimRotationSpeed * Time.deltaTime);
+            Quaternion n = Quaternion.LookRotation(q);
+            rb.MoveRotation(Quaternion.Slerp(transform.rotation, n, playerSettings.RotationSpeed * Time.deltaTime));
+
         }
 
         if (direction != Vector3.zero)
@@ -78,10 +81,11 @@ public class MovementLogic : MonoBehaviour
             {
                 // rotazione basata sulla direzione di movimento, se non si mira
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, playerSettings.RotationSpeed * Time.deltaTime);
+                rb.MoveRotation(Quaternion.Slerp(transform.rotation, targetRotation, playerSettings.RotationSpeed * Time.deltaTime));
             }
 
-            transform.position += direction.normalized * playerSettings.MoveSpeed * Time.deltaTime;
+
+            rb.MovePosition(transform.position + direction.normalized * playerSettings.MoveSpeed * Time.deltaTime);
         }
     }
 
