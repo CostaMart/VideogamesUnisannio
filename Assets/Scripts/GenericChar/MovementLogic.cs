@@ -45,7 +45,7 @@ public class MovementLogic : MonoBehaviour
     }
 
 
-    private void Update()
+    private void FixedUpdate()
     {
 
         Vector3 direction = Vector3.zero;
@@ -71,7 +71,7 @@ public class MovementLogic : MonoBehaviour
             Vector3 q = camera.transform.forward;
             q.y = 0;
             Quaternion n = Quaternion.LookRotation(q);
-            rb.MoveRotation(Quaternion.Slerp(transform.rotation, n, playerSettings.RotationSpeed * Time.deltaTime));
+            rb.MoveRotation(Quaternion.Slerp(transform.rotation, n, playerSettings.RotationSpeed));
 
         }
 
@@ -81,11 +81,11 @@ public class MovementLogic : MonoBehaviour
             {
                 // rotazione basata sulla direzione di movimento, se non si mira
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
-                rb.MoveRotation(Quaternion.Slerp(transform.rotation, targetRotation, playerSettings.RotationSpeed * Time.deltaTime));
+                rb.MoveRotation(Quaternion.Slerp(transform.rotation, targetRotation, playerSettings.RotationSpeed));
             }
 
 
-            rb.MovePosition(transform.position + direction.normalized * playerSettings.MoveSpeed * Time.deltaTime);
+            rb.MovePosition(transform.position + direction.normalized * playerSettings.MoveSpeed);
         }
     }
 

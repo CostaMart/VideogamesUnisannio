@@ -7,7 +7,7 @@
                 {
                     "effectType": "sa",
                     "target": "!CharStats.1",
-                    "expr": "!CharStats.1 - 10"
+                    "expr": "!CharStats.1 - 1"
                 }
             ]
         }

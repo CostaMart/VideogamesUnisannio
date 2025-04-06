@@ -22,7 +22,11 @@ namespace Weapon.State
         public float heightScale = 1f;
         public float lengthScale = 1f;
 
-        private (Rigidbody, Transform)[] bulletsInPool;
+        protected override void Awake()
+        {
+            base.Awake();
+            bulletEffects = ItemManager.bulletPool[0];
+        }
 
         protected override int ComputeID()
         {

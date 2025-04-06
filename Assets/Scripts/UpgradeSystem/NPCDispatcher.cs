@@ -26,7 +26,8 @@ public class NPCDispatcher : EffectsDispatcher
 
     public override void DispatchFromOtherDispatcher(AbstractEffect up)
     {
-        if(up == null) return;
+        Debug.Log("recieved effect from other dispatcher");
+        if (up == null) return;
         if (activeEffects.ContainsKey(up.ID)) return;
 
         // useful to keep in check which effects are already active
