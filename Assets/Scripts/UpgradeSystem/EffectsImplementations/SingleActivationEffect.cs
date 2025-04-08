@@ -13,11 +13,9 @@ public class SingleActivationEffect : AbstractEffect
   {
   }
 
-  public override float? Activate(AbstractStatus target)
+  public override object Activate(AbstractStatus target)
   {
     var result = base.DoEffect();
-    DetachEffect();
-    target.RemoveEffect(this);
     return result;
   }
   public override void Attach(Dictionary<int, AbstractStatus> target, EffectsDispatcher dispatcher)
@@ -29,7 +27,7 @@ public class SingleActivationEffect : AbstractEffect
       target[this.localTargetClassID].AttachEffect(this);
       return;
     }
-    target[this.externalTargetClassID].AttachEffect(this);  
+    target[this.externalTargetClassID].AttachEffect(this);
   }
 
 }

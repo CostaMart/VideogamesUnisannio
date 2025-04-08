@@ -1,4 +1,5 @@
 
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PhysicalState : AbstractStatus
@@ -16,6 +17,7 @@ public class PhysicalState : AbstractStatus
     public float lengthScale = 1f;
 
     private Rigidbody rb;
+
 
     protected override int ComputeID()
     {

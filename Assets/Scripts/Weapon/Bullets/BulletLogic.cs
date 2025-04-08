@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -84,4 +85,5 @@ public class Bullet : AbstractStatus
         transform.position = initialPos; // Riportiamo il proiettile alla posizione iniziale
         this.gameObject.SetActive(false); // Disattiviamo il proiettile
     }
+
 }

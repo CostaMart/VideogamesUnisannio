@@ -414,15 +414,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dirty: 1
-  rotationSpeed: 20
-  life: 100
-  aimRotationSpeed: 20
-  jumpSpeedy: 5
-  jumpSpeedx: 5
-  jumpSpeedz: 5
-  moveSpeed: 0.5
-  speedLimitBeforeRagdolling: 2000
-  maxJumps: 1
 --- !u!135 &18548424
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -602,15 +593,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dirty: 0
-  rotationSpeed: 0.5
-  life: 100
-  aimRotationSpeed: 5
-  jumpSpeedy: 5
-  jumpSpeedx: 5
-  jumpSpeedz: 5
-  moveSpeed: 0.01
-  speedLimitBeforeRagdolling: 20
-  maxJumps: 1
 --- !u!114 &68456155
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4451,7 +4433,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2836004475591695743, guid: f432554f564e69242897607d34218939, type: 3}
       propertyPath: m_Name
-      value: PBRCharacter
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 2836004475591695743, guid: f432554f564e69242897607d34218939, type: 3}
       propertyPath: m_Layer

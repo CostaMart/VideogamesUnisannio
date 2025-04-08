@@ -35,7 +35,7 @@ public class MovementLogic : MonoBehaviour
     }
     void Start()
     {
-        jumpsAvailable = playerSettings.MaxJumps;
+        jumpsAvailable = playerSettings.GetStatByID<int>((int)FeatureType.maxJumps);
 
         col = GetComponent<Collider>();
         anim = GetComponent<Animator>();
@@ -71,7 +71,7 @@ public class MovementLogic : MonoBehaviour
             Vector3 q = camera.transform.forward;
             q.y = 0;
             Quaternion n = Quaternion.LookRotation(q);
-            rb.MoveRotation(Quaternion.Slerp(transform.rotation, n, playerSettings.RotationSpeed));
+            rb.MoveRotation(Quaternion.Slerp(transform.rotation, n, playerSettings.GetStatByID<float>((int)FeatureType.aimRotationSpeed)));
 
         }
 
@@ -81,11 +81,11 @@ public class MovementLogic : MonoBehaviour
             {
                 // rotazione basata sulla direzione di movimento, se non si mira
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
-                rb.MoveRotation(Quaternion.Slerp(transform.rotation, targetRotation, playerSettings.RotationSpeed));
+                rb.MoveRotation(Quaternion.Slerp(transform.rotation, targetRotation, playerSettings.GetStatByID<float>((int)FeatureType.rotationSpeed)));
             }
 
 
-            rb.MovePosition(transform.position + direction.normalized * playerSettings.MoveSpeed);
+            rb.MovePosition(transform.position + direction.normalized * playerSettings.GetStatByID<float>((int)FeatureType.speed) * Time.deltaTime);
         }
     }
 
@@ -93,7 +93,7 @@ public class MovementLogic : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("terrain"))
-            jumpsAvailable = playerSettings.MaxJumps;
+            jumpsAvailable = playerSettings.GetStatByID<int>((int)FeatureType.maxJumps);
     }
 
     public void Jump()
@@ -106,7 +106,10 @@ public class MovementLogic : MonoBehaviour
         if (jumpsAvailable <= 0) return;
 
 
-        rb.linearVelocity = new Vector3(direction.x * playerSettings.jumpSpeedx, playerSettings.jumpSpeedy, direction.z * playerSettings.jumpSpeedz);
+        rb.linearVelocity = new Vector3(
+            rb.linearVelocity.x,
+            playerSettings.GetStatByID<float>((int)FeatureType.jumpSpeedy),
+            rb.linearVelocity.z);
         jumpsAvailable--;
     }
 

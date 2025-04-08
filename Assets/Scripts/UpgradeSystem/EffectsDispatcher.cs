@@ -141,7 +141,7 @@ public abstract class EffectsDispatcher : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogError(e.Message);
+                        Debug.LogError(e.Message + " in gameobject: " + transform.gameObject.name + "in object" + parent.name);
                     }
                 }
             }

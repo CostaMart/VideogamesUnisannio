@@ -39,5 +39,6 @@ namespace Weapon.State
                 return ItemManager.statClassToIdRegistry["BulletPoolStateSecondary"];
             }
         }
+
     }
 }

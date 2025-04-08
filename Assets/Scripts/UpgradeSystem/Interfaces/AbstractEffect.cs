@@ -32,7 +32,7 @@ public abstract class AbstractEffect
     /// the ones with ! before)
     /// </summary>
     public int[][] externParametersRef;
-    
+
     /// <summary>
     /// This will contain references to the objects resolved by dispatcher, this effect can use this references
     /// to resolve values he needs on activation.
@@ -162,7 +162,7 @@ public abstract class AbstractEffect
                 }
             }
         }
-        
+
         ex = new Expression(s);
     }
 
@@ -176,7 +176,7 @@ public abstract class AbstractEffect
     /// Provides access to other game system elements, such as event dispatchers. 
     /// Use this to implement custom behaviors.
     /// </param>
-    protected float DoEffect()
+    protected object DoEffect()
     {
         resolvedValsLocal = resolveValues(localParametersRefClasses, localParametersRef);
         resolvedValsExternal = resolveValues(externParametersRefClasses, externParametersRef);
@@ -194,7 +194,7 @@ public abstract class AbstractEffect
             ex.Parameters[externParametersKey[x].ToString()] = resolvedValsExternal[x];
             x++;
         }
-        
+
         var returnable = Convert.ToSingle(ex.Evaluate());
         return returnable;
     }
@@ -206,7 +206,7 @@ public abstract class AbstractEffect
 
         foreach (var refClass in statusClass)
         {
-            resolved[x] = refClass.GetStatByID(paramIndexes[x][1]);
+            resolved[x] = refClass.GetStatByID<object>(paramIndexes[x][1]);
         }
 
         return resolved;
@@ -218,7 +218,7 @@ public abstract class AbstractEffect
     /// </summary>
     /// <param name="target"></param>
     /// <param name="dispatcher"></param>
-    public abstract void Attach(Dictionary<int,AbstractStatus> target, EffectsDispatcher dispatcher);
+    public abstract void Attach(Dictionary<int, AbstractStatus> target, EffectsDispatcher dispatcher);
 
 
     /// <summary>
@@ -228,7 +228,7 @@ public abstract class AbstractEffect
     /// <paramref name="target"/> is the target of the effect.
     /// </summary>
     /// TODO: potrei voler levare target come parametro per impedire a chi scrive gli effetti di fare cose strane
-    public abstract float? Activate(AbstractStatus target);
+    public abstract object Activate(AbstractStatus target);
 
     protected void DetachEffect()
     {

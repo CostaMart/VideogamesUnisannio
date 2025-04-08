@@ -91,4 +91,5 @@ public class WeaponState : AbstractStatus
         weaponContrainer.activeLogic.Enable();
         Debug.Log("logic correctly assigned");
     }
+
 }

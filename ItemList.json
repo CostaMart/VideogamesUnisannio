@@ -6,7 +6,7 @@
             "effects": [
                 {
                     "effectType": "sa",
-                    "target": "@BulletPoolStatePrimary.9",
+                    "target": "@CharStats.1",
                     "expr": "100"
                 }
             ]

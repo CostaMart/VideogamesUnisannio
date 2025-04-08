@@ -27,17 +27,18 @@ class OverTimeEffect : AbstractEffect
         timeLimitBeforeActivation = 1 / actRate;
     }
 
-    public override float? Activate(AbstractStatus target)
+    public override object Activate(AbstractStatus target)
     {
         return Tick(target);
     }
 
 
-    private float? Tick(AbstractStatus target)
+    private object Tick(AbstractStatus target)
+
     {
         totalTimeElapsed += Time.deltaTime;
         activationTimer += Time.deltaTime;
-        float? result = null;
+        object result = null;
 
         if (activationTimer >= timeLimitBeforeActivation)
         {
