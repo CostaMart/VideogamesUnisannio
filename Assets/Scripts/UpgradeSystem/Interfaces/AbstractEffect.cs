@@ -100,7 +100,7 @@ public abstract class AbstractEffect
             externalTargetClassID = ItemManager.statClassToIdRegistry[targetClassString.Split(".")[0].Replace("!", "")];
         }
 
-        targetAttributeID = int.Parse(targetClassString.Split(".")[1]);
+        targetAttributeID = (int)Enum.Parse(typeof(FeatureType), targetClassString.Split(".")[1]);
 
 
         char c = 'A';
@@ -124,11 +124,11 @@ public abstract class AbstractEffect
         {
             s = s.Replace(match.ToString(), c.ToString());
             string laClass = match.ToString().Split('.')[0].Substring(1);
-            int laAttribute = int.Parse(match.ToString().Split('.')[1]);
+            string laAttribute = match.ToString().Split('.')[1];
 
             localParametersRef[i] = new int[2];
             localParametersRef[i][0] = ItemManager.statClassToIdRegistry[laClass];
-            localParametersRef[i][1] = laAttribute;
+            localParametersRef[i][1] = (int)Enum.Parse(typeof(FeatureType), laAttribute);
             localParametersKey[i] = c;
 
             Debug.Log("it is just been assigned key " + c.ToString() + " for item " + itemID);
@@ -140,11 +140,11 @@ public abstract class AbstractEffect
         {
             s = s.Replace(match.ToString(), c.ToString());
             string laClass = match.ToString().Split('.')[0].Substring(1);
-            int laAttribute = int.Parse(match.ToString().Split('.')[1]);
+            string laAttribute = match.ToString().Split('.')[1];
 
             externParametersRef[i] = new int[2];
             externParametersRef[i][0] = ItemManager.statClassToIdRegistry[laClass];
-            externParametersRef[i][1] = laAttribute;
+            externParametersRef[i][1] = (int)Enum.Parse(typeof(FeatureType), laAttribute);
             externParametersKey[i] = c;
 
             c += (char)1;

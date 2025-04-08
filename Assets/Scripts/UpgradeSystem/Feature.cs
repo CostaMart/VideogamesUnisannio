@@ -11,9 +11,21 @@ public enum FeatureType
     jumpSpeedx,
     jumpSpeedz,
     speedLimitBeforeRagdolling,
-
     maxJumps,
-
+    magCount,
+    magSize,
+    fireRate,
+    fireStrength,
+    laserLength,
+    automatic,
+    activeLogicIndex,
+    explosionRadius,
+    mass,
+    destroyOnHit,
+    widthScale,
+    heightScale,
+    lengthScale,
+    bulletEffects
 }
 
 public class Feature

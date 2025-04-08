@@ -32,11 +32,11 @@ public class ItemManager
             {"PhysicalState", 7}
         };
 
-        globalItemPool = ComputeAllItems("/home/costamh/HeroDivers/ItemList.json", false);
+        globalItemPool = ComputeAllItems("/home/costamh/HeroDivers/gameConfig/ItemList.json", false);
 
         Debug.Log("items compiled");
 
-        bulletPool = ComputeAllItems("/home/costamh/HeroDivers/Bullets.json", true);
+        bulletPool = ComputeAllItems("/home/costamh/HeroDivers/gameConfig/Bullets.json", true);
     }
 
     /// <summary>

@@ -72,9 +72,9 @@ public class LaserWeaponBehaviour : AbstractWeaponLogic
         RaycastHit hit;
 
         // Sempre disegna il laser
-        Vector3 endPoint = origineLaser + direzioneLaser * weaponStat.laserLength;
+        Vector3 endPoint = origineLaser + direzioneLaser * weaponStat.GetStatByID<float>((int)FeatureType.laserLength);
 
-        if (Physics.Raycast(ray, out hit, weaponStat.laserLength, weaponStat.laserMask))
+        if (Physics.Raycast(ray, out hit, weaponStat.GetStatByID<float>((int)FeatureType.laserLength), weaponStat.laserMask))
         {
             endPoint = hit.point;
 

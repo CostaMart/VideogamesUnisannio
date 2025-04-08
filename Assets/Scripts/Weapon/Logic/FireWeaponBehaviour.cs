@@ -9,7 +9,7 @@ public class FireWeaponBehaviour : AbstractWeaponLogic
     [Tooltip("if animator is provided recharging synchronizes with 'Reload' animation")]
     public Animator anim;
     public bool animatorSet = false;
-    public float lastShotTime;
+    public float timer = 0f;
     public int shootingIndex = 0;
 
 
@@ -22,7 +22,7 @@ public class FireWeaponBehaviour : AbstractWeaponLogic
 
     public override void Enable()
     {
-        lastShotTime = 0;
+        timer = 0;
         shootingIndex = 0;
         weaponStat.controlEventManager.AddListenerReload(Reload);
         weaponStat.inputSys.actions["Attack"].performed += context => { this.shooting = true; };
@@ -31,11 +31,13 @@ public class FireWeaponBehaviour : AbstractWeaponLogic
 
     public override void Updating()
     {
-        if (weaponStat.bulletPool.Length < weaponStat.magCount * weaponStat.magSize)
+        if (weaponStat.bulletPool.Length < weaponStat.GetStatByID<int>((int)FeatureType.magCount) *
+         weaponStat.GetStatByID<int>((int)FeatureType.magSize))
         {
             if (weaponStat.bulletPool != null)
             {
-                var newPool = new GameObject[weaponStat.magCount * weaponStat.magSize];
+                var newPool = new GameObject[weaponStat.GetStatByID<int>((int)FeatureType.magCount) *
+                weaponStat.GetStatByID<int>((int)FeatureType.magSize)];
                 int i = 0;
 
                 foreach (GameObject bullet in weaponStat.bulletPool)
@@ -64,52 +66,54 @@ public class FireWeaponBehaviour : AbstractWeaponLogic
         DrawLaser();
     }
 
-
     public override void Shoot()
     {
-        // can't shoot while reloading
+        // Non si spara se si sta ricaricando
         if (animatorSet && anim.GetCurrentAnimatorStateInfo(1).IsName("Reload"))
-        {
             return;
-        }
 
-        // can't shoot if not enough time has passed since last shot
-        if (Time.time - lastShotTime < 1 / weaponStat.fireRate) return;
-
-        // can't shoot if no bullets are available
-        if (shootingIndex != 0 && shootingIndex % weaponStat.magSize == 0)
-        {
+        // Non si spara se abbiamo già sparato tutti i colpi del caricatore
+        if (shootingIndex >= weaponStat.GetStatByID<int>((int)FeatureType.magSize))
             return;
-        }
 
+        // Rateo di fuoco
+        float fireDelay = 1f / weaponStat.GetStatByID<float>((int)FeatureType.fireRate);
+        if (Time.time - timer < fireDelay)
+            return;
+
+        // Sparo
+        timer = Time.time;
 
         GameObject bullet = weaponStat.bulletPool[shootingIndex];
         bullet.SetActive(true);
         bullet.transform.position = weaponStat.muzzle.position;
         bullet.transform.rotation = weaponStat.muzzle.rotation;
-        weaponStat.bulletRigids[shootingIndex].linearVelocity = weaponStat.muzzle.forward * weaponStat.fireStrength;
 
-        shootingIndex = (shootingIndex + 1) % weaponStat.bulletPool.Length;
-        lastShotTime = Time.time;
+        weaponStat.bulletRigids[shootingIndex].linearVelocity = weaponStat.muzzle.forward
+        * weaponStat.GetStatByID<float>((int)FeatureType.fireStrength);
 
+        shootingIndex++;
 
-        if (!weaponStat.automatic)
-        {
+        // Se non è automatico, disattiviamo il flag di shooting
+        if (!weaponStat.GetStatByID<bool>((int)FeatureType.automatic))
             shooting = false;
-        }
     }
+
+
 
     public override void Reload()
     {
-        if (weaponStat.magCount > 0)
+        if (weaponStat.GetStatByID<int>((int)FeatureType.magCount) > 0)
         {
             if (animatorSet)
             {
                 anim.SetTrigger("Reload");
             }
 
-            lastShotTime = 0;
-            weaponStat.magCount--;
+            timer = 0;
+            weaponStat.SetStatByID((int)FeatureType.magCount,
+                weaponStat.GetStatByID<int>((int)FeatureType.magCount) - 1);
+
             shootingIndex = 0;
         }
     }
@@ -124,7 +128,7 @@ public class FireWeaponBehaviour : AbstractWeaponLogic
 
         RaycastHit hit;
         // Se il raggio colpisce qualcosa, usa la posizione di impatto, altrimenti usa la lunghezza massima
-        if (Physics.Raycast(ray, out hit, weaponStat.laserLength, weaponStat.laserMask))
+        if (Physics.Raycast(ray, out hit, weaponStat.GetStatByID<float>((int)FeatureType.laserLength), weaponStat.laserMask))
         {
             weaponStat.lineRenderer.SetPosition(0, origineLaser);         // Punto di partenza (muzzle)
             weaponStat.lineRenderer.SetPosition(1, hit.point);            // Punto di impatto
@@ -132,7 +136,8 @@ public class FireWeaponBehaviour : AbstractWeaponLogic
         else
         {
             weaponStat.lineRenderer.SetPosition(0, origineLaser);         // Punto di partenza (muzzle)
-            weaponStat.lineRenderer.SetPosition(1, origineLaser + direzioneLaser * weaponStat.laserLength); // Lunghezza massima del laser
+            weaponStat.lineRenderer.SetPosition(1, origineLaser + direzioneLaser *
+             weaponStat.GetStatByID<float>((int)FeatureType.laserLength));// Lunghezza massima del laser
         }
     }
 

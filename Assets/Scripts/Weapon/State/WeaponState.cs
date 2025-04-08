@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Weapon.State;
 
-public class WeaponState : AbstractStatus
+public class WeaponStats : AbstractStatus
 {
 
 
@@ -17,25 +17,18 @@ public class WeaponState : AbstractStatus
     // the bullet will be fired from this muzzle position and go in the direction of the transform.forward
     [Header("Weapon Stats")]
     [Tooltip("the bullet will be fired from this muzzle position and go in the direction it is pointing")]
-    [SerializeField] public int magCount;
-    public int magSize = 1;
-    public float fireRate;
-    public float fireStrength = 1f;
     public int laserType;
     public float laserThickness = 0.1f;
-    public float laserLength = 10f;
     public LayerMask laserMask;
 
-    [SerializeField] public bool automatic = false;
     [SerializeField] private bool isPrimary = true; // 0 = primary, 1 = secondary
     [SerializeField] private Material[] laserMaterial;
-    [SerializeField] public BulletPoolState bulletPoolState;
+    [SerializeField] public BulletPoolStats bulletPoolState;
 
     [Header("Weapon Logic")]
     [Tooltip("list of wepon logics this wepon can use")]
-    public BulletPoolState pool;
+    public BulletPoolStats pool;
     [SerializeField] private List<AbstractWeaponLogic> weaponLogics;
-    public int activeLogicIndex = 0;
     [HideInInspector] public AbstractWeaponLogic activeLogic;
     [HideInInspector] public WeaponBehaviourContainer weaponContrainer;
     public ControlEventManager controlEventManager;
@@ -48,6 +41,7 @@ public class WeaponState : AbstractStatus
     protected override void Awake()
     {
         base.Awake();
+
         weaponContrainer = GetComponent<WeaponBehaviourContainer>();
         lineRenderer = muzzle.gameObject.GetComponent<LineRenderer>();
         lineRenderer.material = laserMaterial[laserType];
@@ -86,7 +80,7 @@ public class WeaponState : AbstractStatus
 
     public void ReassingLogic()
     {
-        weaponContrainer.activeLogic = weaponLogics[activeLogicIndex];
+        weaponContrainer.activeLogic = weaponLogics[GetStatByID<int>((int)FeatureType.activeLogicIndex)];
         weaponContrainer.activeLogic.SetWeaponState(this);
         weaponContrainer.activeLogic.Enable();
         Debug.Log("logic correctly assigned");

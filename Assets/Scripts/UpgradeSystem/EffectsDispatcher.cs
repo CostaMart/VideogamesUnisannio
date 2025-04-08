@@ -16,8 +16,8 @@ public abstract class EffectsDispatcher : MonoBehaviour
     [SerializeField] protected Dictionary<int, AbstractStatus> affectables = new Dictionary<int, AbstractStatus>();
     [SerializeField] private ControlEventManager controlEventManager;
 
-    [SerializeField] private BulletPoolState bulletPoolPrimary;
-    [SerializeField] private BulletPoolState bulletPoolPoolSecondary;
+    [SerializeField] private BulletPoolStats bulletPoolPrimary;
+    [SerializeField] private BulletPoolStats bulletPoolPoolSecondary;
 
     public List<PermanentAreaEffect> toExternalDispatchArea = new List<PermanentAreaEffect>();
 

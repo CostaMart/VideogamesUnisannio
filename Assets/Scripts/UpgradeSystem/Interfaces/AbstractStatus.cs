@@ -31,7 +31,7 @@ public abstract class AbstractStatus : MonoBehaviour
     public Dictionary<FeatureType, Feature> LoadFeatures()
     {
 
-        string[] lines = File.ReadAllLines("/home/costamh/HeroDivers/Features.txt");
+        string[] lines = File.ReadAllLines("/home/costamh/HeroDivers/gameConfig/Features.txt");
         bool found = false;
         bool hasBeenFound = false;
         Dictionary<FeatureType, Feature> features = new Dictionary<FeatureType, Feature>();
@@ -43,7 +43,7 @@ public abstract class AbstractStatus : MonoBehaviour
             line = line.Replace(" ", "");
             line = line.Split("//")[0];
 
-            if (line.Contains("##"))
+            if (found && line.Contains("##"))
             {
                 found = false;
             }
@@ -51,34 +51,46 @@ public abstract class AbstractStatus : MonoBehaviour
 
             if (found)
             {
-                string[] parts = line.Split("=");
-                Type t;
-                FeatureType featureType = (FeatureType)Enum.Parse(typeof(FeatureType), parts[0]);
-
-                if (int.TryParse(parts[1], out _))
+                try
                 {
-                    Feature f = new Feature(featureType, int.Parse(parts[1]), typeof(int));
-                    f.SetValue(int.Parse(parts[1]));
-                    features.Add(featureType, f);
-                    Debug.Log("parsed as int");
+                    string[] parts = line.Split("=");
+
+                    Type t;
+                    FeatureType featureType = (FeatureType)Enum.Parse(typeof(FeatureType), parts[0]);
+
+                    if (int.TryParse(parts[1], out _))
+                    {
+                        Feature f = new Feature(featureType, int.Parse(parts[1]), typeof(int));
+                        f.SetValue(int.Parse(parts[1]));
+                        features.Add(featureType, f);
+                        Debug.Log("gameobject" + this.gameObject.name + " parsed value: " + parts[1] + " of " + parts[0]
+                         + " as int");
+                    }
+                    else if (float.TryParse(parts[1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out _))
+                    {
+                        Feature f = new Feature(featureType, float.Parse(parts[1], System.Globalization.CultureInfo.InvariantCulture), typeof(float));
+                        f.SetValue(float.Parse(parts[1].Replace(" ", ""), System.Globalization.CultureInfo.InvariantCulture));
+                        features.Add(featureType, f);
+                        Debug.Log("gameobject" + this.gameObject.name + " parsed value: " + parts[1] + " of " + parts[0]
+                         + " as float");
+                    }
+                    else
+                    {
+                        Feature f = new Feature(featureType, bool.Parse(parts[1]), typeof(bool));
+                        f.SetValue(bool.Parse(parts[1]));
+                        features.Add(featureType, f);
+                        Debug.Log("gameobject" + this.gameObject.name + " parsed value: " + parts[1] + " of " + parts[0]
+                         + " as bool");
+                    }
+
                 }
-                else if (float.TryParse(parts[1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out _))
+                catch
+                (Exception e)
                 {
-                    Feature f = new Feature(featureType, float.Parse(parts[1], System.Globalization.CultureInfo.InvariantCulture), typeof(float));
-                    f.SetValue(float.Parse(parts[1].Replace(" ", ""), System.Globalization.CultureInfo.InvariantCulture));
-                    features.Add(featureType, f);
-                }
-                else
-                {
-                    Feature f = new Feature(featureType, bool.Parse(parts[1]), typeof(bool));
-                    f.SetValue(bool.Parse(parts[1]));
-                    features.Add(featureType, f);
-                    Debug.Log("parsed as bool");
+                    Debug.LogError("Error in parsing line: " + line);
                 }
 
 
-
-                Debug.Log("this is the value i found in file: " + parts[1]);
             }
 
             if (line.Contains("#" + this.gameObject.name + "-" + this.GetType().Name))
@@ -117,6 +129,7 @@ public abstract class AbstractStatus : MonoBehaviour
         Debug.Log("Assigning ID to status class " + this.GetType().Name);
         ID = ComputeID();
         new ItemManager();
+        this.dirty = true;
     }
 
     /// <summary>
@@ -145,7 +158,8 @@ public abstract class AbstractStatus : MonoBehaviour
         catch (KeyNotFoundException)
         {
             Debug.LogError("invoked GetStatByID of object: " + this.GetType().Name
-            + " in gameobject " + this.gameObject.name + " for id " + id + " but the id is not present in the features dictionary");
+            + " in gameobject " + this.gameObject.name + " for " + (FeatureType)id +
+            " but the feature as not been assigned");
         }
         catch (InvalidCastException)
         {
@@ -186,8 +200,8 @@ public abstract class AbstractStatus : MonoBehaviour
             if (features[featureKey].type == typeof(int))
             {
                 int inthelper = (int)features[featureKey].baseValue;
-                inthelper += (int)Convert.ToInt32(activeEffects.Where
-                (x => x.targetAttributeID == (int)features[featureKey].id).Sum(x => (int)x.Activate(this)));
+                inthelper += Convert.ToInt32(activeEffects.Where
+                (x => x.targetAttributeID == (int)features[featureKey].id).Sum(x => Convert.ToInt32(x.Activate(this))));
                 toApply = inthelper;
             }
             else if (features[featureKey].type == typeof(float) || features[featureKey].type == typeof(Single))
@@ -199,7 +213,9 @@ public abstract class AbstractStatus : MonoBehaviour
             }
             else if (features[featureKey].type == typeof(bool))
             {
-                toApply = activeEffects.Where(x => x.targetAttributeID == (int)features[featureKey].id).Last().Activate(this);
+                if (activeEffects.Where(x => x.targetAttributeID == (int)features[featureKey].id).Count() != 0)
+                    toApply = activeEffects.Where(x => x.targetAttributeID == (int)features[featureKey].id).Last().Activate(this);
+                else toApply = true;
             }
             else
             {

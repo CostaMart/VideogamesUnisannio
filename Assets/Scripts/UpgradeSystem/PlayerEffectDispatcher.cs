@@ -39,23 +39,27 @@ public class PlayerEffectDispatcher : EffectsDispatcher
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            this.ItemDispatch(ItemManager.globalItemPool[0]);
+        }
 
-            foreach (var effect in toExternalDispatchArea)
+        foreach (var effect in toExternalDispatchArea)
+        {
+            foreach (var disp in dispatchers)
             {
-                foreach (var disp in dispatchers)
-                {
-                    disp.DispatchFromOtherDispatcher(effect.GetEffectToDeploy(this));
-                    toRemovesDisp.Add(disp);
-                }
+                disp.DispatchFromOtherDispatcher(effect.GetEffectToDeploy(this));
+                toRemovesDisp.Add(disp);
             }
+        }
 
-            foreach (var disp in toRemovesDisp)
-            {
-                dispatchers.Remove(disp);
-            }
+        foreach (var disp in toRemovesDisp)
+        {
+            dispatchers.Remove(disp);
+        }
 
-            toRemovesDisp.Clear();
-            toExternalDispatchAreaRemove.Clear();
+        toRemovesDisp.Clear();
+        toExternalDispatchAreaRemove.Clear();
 
     }
 

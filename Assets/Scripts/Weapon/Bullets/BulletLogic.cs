@@ -17,13 +17,14 @@ public class Bullet : AbstractStatus
 
     public Item bulletEffets;
 
-    public BulletPoolState bulletPoolState;
+    public BulletPoolStats bulletPoolState;
 
     private float EnableTime;
 
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         c = GetComponent<Collider>();
         rb = GetComponent<Rigidbody>();
         initialPos = transform.position;
@@ -45,9 +46,12 @@ public class Bullet : AbstractStatus
 
         if (bulletPoolState.dirty)
         {
-            transform.localScale = new Vector3(bulletPoolState.widthScale, bulletPoolState.heightScale,
-            bulletPoolState.lengthScale);
-            rb.mass = bulletPoolState.baseMass;
+            transform.localScale = new Vector3(bulletPoolState
+            .GetStatByID<float>((int)FeatureType.widthScale), bulletPoolState
+            .GetStatByID<float>((int)FeatureType.heightScale),
+            bulletPoolState.GetStatByID<float>((int)FeatureType.lengthScale));
+
+            rb.mass = bulletPoolState.GetStatByID<float>((int)FeatureType.mass);
         }
     }
 
@@ -56,7 +60,7 @@ public class Bullet : AbstractStatus
     void OnCollisionEnter(Collision collision)
     {
         Debug.Log("Bullet colliding with " + collision.gameObject.name);
-        Collider[] colliders = Physics.OverlapSphere(collision.transform.position, bulletPoolState.explosionRadius);
+        Collider[] colliders = Physics.OverlapSphere(collision.transform.position, bulletPoolState.GetStatByID<float>((int)FeatureType.explosionRadius));
 
         foreach (Collider col in colliders)
         {
@@ -73,7 +77,7 @@ public class Bullet : AbstractStatus
             }
         }
 
-        if (bulletPoolState.destroyOnHit)
+        if (bulletPoolState.GetStatByID<bool>((int)FeatureType.destroyOnHit))
             resetItem();
     }
 
