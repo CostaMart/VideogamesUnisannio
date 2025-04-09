@@ -20,7 +20,7 @@ automatic = true
 activeLogicIndex = 1 
 ##
 
-#BulletPool-BulletPoolStats
+#bulletPool-BulletPoolStats
 mass = 2.0
 explosionRadius = 2.0
 destroyOnHit = true

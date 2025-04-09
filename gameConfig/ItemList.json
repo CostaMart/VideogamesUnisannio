@@ -6,8 +6,8 @@
             "effects": [
                 {
                     "effectType": "sa",
-                    "target": "@CharStats.maxJumps",
-                    "expr": "100"
+                    "target": "@CharStats.0",
+                    "expr": "10"
                 }
             ]
         }

@@ -128,7 +128,7 @@ public abstract class AbstractEffect
 
             localParametersRef[i] = new int[2];
             localParametersRef[i][0] = ItemManager.statClassToIdRegistry[laClass];
-            localParametersRef[i][1] = (int)Enum.Parse(typeof(FeatureType), laAttribute);
+            localParametersRef[i][1] = int.Parse(laAttribute);
             localParametersKey[i] = c;
 
             Debug.Log("it is just been assigned key " + c.ToString() + " for item " + itemID);
@@ -144,7 +144,7 @@ public abstract class AbstractEffect
 
             externParametersRef[i] = new int[2];
             externParametersRef[i][0] = ItemManager.statClassToIdRegistry[laClass];
-            externParametersRef[i][1] = (int)Enum.Parse(typeof(FeatureType), laAttribute);
+            externParametersRef[i][1] = int.Parse(laAttribute);
             externParametersKey[i] = c;
 
             c += (char)1;

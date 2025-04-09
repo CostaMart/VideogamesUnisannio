@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Weapon.State;
 using static ItemManager;
@@ -15,9 +16,13 @@ public abstract class EffectsDispatcher : MonoBehaviour
 
     [SerializeField] protected Dictionary<int, AbstractStatus> affectables = new Dictionary<int, AbstractStatus>();
     [SerializeField] private ControlEventManager controlEventManager;
-
     [SerializeField] private BulletPoolStats bulletPoolPrimary;
     [SerializeField] private BulletPoolStats bulletPoolPoolSecondary;
+
+    /// <summary>
+    /// mantiene uno storico degli id degli item attivati durante la partita
+    /// </summary>
+    private List<int> activatedItems = new List<int>();
 
     public List<PermanentAreaEffect> toExternalDispatchArea = new List<PermanentAreaEffect>();
 
@@ -55,6 +60,8 @@ public abstract class EffectsDispatcher : MonoBehaviour
 
             return;
         }
+
+        activatedItems.Add(it.id);
 
         foreach (AbstractEffect up in it.effects)
         {
@@ -137,11 +144,12 @@ public abstract class EffectsDispatcher : MonoBehaviour
                 {
                     if (upgradable.GetType().Name == "WeaponState")
                     {
-                        Debug.LogError("This character has two Weapon of the same type (primary or secondary), please check gameobject: " + transform.gameObject.name + "in object" + parent.name);
+                        Debug.LogError("This character has two Weapon of the same type  (primary or secondary), please check gameobject: " + transform.gameObject.name + "in object" + parent.name);
                     }
                     else
                     {
-                        Debug.LogError(e.Message + " in gameobject: " + transform.gameObject.name + "in object" + parent.name);
+                        Debug.LogError(e.Message + " in gameobject: " + transform.gameObject.name + "in object"
+                        + parent.name);
                     }
                 }
             }
@@ -153,9 +161,18 @@ public abstract class EffectsDispatcher : MonoBehaviour
         }
     }
 
-    void OnDrawGizmos()
+    /// <summary>
+    /// returns a collection of each feature contribution by any stat type class in the game object hierarchy starting
+    /// from the position of the dispatcher
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="f"></param>
+    /// <returns></returns>
+    public T[] GetAllFeatureByType<T>(FeatureType f)
     {
-        Gizmos.DrawWireSphere(transform.position, 5);
+        return affectables.Values
+            .SelectMany(status => status.GetFeatureValuesByType<T>(f))
+            .ToArray();
     }
 }
 

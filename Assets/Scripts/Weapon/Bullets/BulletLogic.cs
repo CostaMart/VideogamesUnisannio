@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Weapon.State;
@@ -47,11 +48,11 @@ public class Bullet : AbstractStatus
         if (bulletPoolState.dirty)
         {
             transform.localScale = new Vector3(bulletPoolState
-            .GetStatByID<float>((int)FeatureType.widthScale), bulletPoolState
-            .GetStatByID<float>((int)FeatureType.heightScale),
-            bulletPoolState.GetStatByID<float>((int)FeatureType.lengthScale));
+            .GetFeatureValuesByType<float>(FeatureType.widthScale).Sum(), bulletPoolState
+            .GetFeatureValuesByType<float>(FeatureType.heightScale).Sum(),
+            bulletPoolState.GetFeatureValuesByType<float>(FeatureType.lengthScale).Sum());
 
-            rb.mass = bulletPoolState.GetStatByID<float>((int)FeatureType.mass);
+            rb.mass = bulletPoolState.GetFeatureValuesByType<float>(FeatureType.mass).Sum();
         }
     }
 
@@ -60,7 +61,7 @@ public class Bullet : AbstractStatus
     void OnCollisionEnter(Collision collision)
     {
         Debug.Log("Bullet colliding with " + collision.gameObject.name);
-        Collider[] colliders = Physics.OverlapSphere(collision.transform.position, bulletPoolState.GetStatByID<float>((int)FeatureType.explosionRadius));
+        Collider[] colliders = Physics.OverlapSphere(collision.transform.position, bulletPoolState.GetFeatureValuesByType<float>(FeatureType.explosionRadius).Sum());
 
         foreach (Collider col in colliders)
         {
@@ -77,7 +78,7 @@ public class Bullet : AbstractStatus
             }
         }
 
-        if (bulletPoolState.GetStatByID<bool>((int)FeatureType.destroyOnHit))
+        if (bulletPoolState.GetFeatureValuesByType<bool>(FeatureType.destroyOnHit).Last())
             resetItem();
     }
 

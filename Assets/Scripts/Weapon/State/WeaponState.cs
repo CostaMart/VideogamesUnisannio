@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEditor.EditorTools;
+using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Weapon.State;
@@ -28,6 +30,7 @@ public class WeaponStats : AbstractStatus
     [Header("Weapon Logic")]
     [Tooltip("list of wepon logics this wepon can use")]
     public BulletPoolStats pool;
+    [SerializeField] private EffectsDispatcher dispatcher;
     [SerializeField] private List<AbstractWeaponLogic> weaponLogics;
     [HideInInspector] public AbstractWeaponLogic activeLogic;
     [HideInInspector] public WeaponBehaviourContainer weaponContrainer;
@@ -80,7 +83,8 @@ public class WeaponStats : AbstractStatus
 
     public void ReassingLogic()
     {
-        weaponContrainer.activeLogic = weaponLogics[GetStatByID<int>((int)FeatureType.activeLogicIndex)];
+        weaponContrainer.activeLogic = weaponLogics[GetFeatureValuesByType<int>(FeatureType.activeLogicIndex).Last()];
+        weaponContrainer.activeLogic.Dispatcher = dispatcher;
         weaponContrainer.activeLogic.SetWeaponState(this);
         weaponContrainer.activeLogic.Enable();
         Debug.Log("logic correctly assigned");

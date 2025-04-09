@@ -6,7 +6,7 @@
             "effects": [
                 {
                     "effectType": "sa",
-                    "target": "@CharStats.1",
+                    "target": "@CharStats.8",
                     "expr": "100"
                 }
             ]

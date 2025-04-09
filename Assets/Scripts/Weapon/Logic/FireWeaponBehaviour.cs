@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ public class FireWeaponBehaviour : AbstractWeaponLogic
     public bool animatorSet = false;
     public float timer = 0f;
     public int shootingIndex = 0;
+    public int magCount = 0;
 
 
     public override void Disable()
@@ -22,6 +24,7 @@ public class FireWeaponBehaviour : AbstractWeaponLogic
 
     public override void Enable()
     {
+        magCount = _dispatcher.GetAllFeatureByType<int>(FeatureType.magCount).Sum();
         timer = 0;
         shootingIndex = 0;
         weaponStat.controlEventManager.AddListenerReload(Reload);
@@ -31,13 +34,13 @@ public class FireWeaponBehaviour : AbstractWeaponLogic
 
     public override void Updating()
     {
-        if (weaponStat.bulletPool.Length < weaponStat.GetStatByID<int>((int)FeatureType.magCount) *
-         weaponStat.GetStatByID<int>((int)FeatureType.magSize))
+        if (weaponStat.bulletPool.Length < _dispatcher.GetAllFeatureByType<int>(FeatureType.magSize).Sum() *
+         _dispatcher.GetAllFeatureByType<int>(FeatureType.magCount).Sum())
         {
             if (weaponStat.bulletPool != null)
             {
-                var newPool = new GameObject[weaponStat.GetStatByID<int>((int)FeatureType.magCount) *
-                weaponStat.GetStatByID<int>((int)FeatureType.magSize)];
+                var newPool = new GameObject[magCount *
+                _dispatcher.GetAllFeatureByType<int>(FeatureType.magSize).Sum()];
                 int i = 0;
 
                 foreach (GameObject bullet in weaponStat.bulletPool)
@@ -73,11 +76,11 @@ public class FireWeaponBehaviour : AbstractWeaponLogic
             return;
 
         // Non si spara se abbiamo già sparato tutti i colpi del caricatore
-        if (shootingIndex >= weaponStat.GetStatByID<int>((int)FeatureType.magSize))
+        if (shootingIndex >= _dispatcher.GetAllFeatureByType<int>(FeatureType.magSize).Sum())
             return;
 
         // Rateo di fuoco
-        float fireDelay = 1f / weaponStat.GetStatByID<float>((int)FeatureType.fireRate);
+        float fireDelay = 1f / _dispatcher.GetAllFeatureByType<float>(FeatureType.fireRate).Sum();
         if (Time.time - timer < fireDelay)
             return;
 
@@ -90,12 +93,12 @@ public class FireWeaponBehaviour : AbstractWeaponLogic
         bullet.transform.rotation = weaponStat.muzzle.rotation;
 
         weaponStat.bulletRigids[shootingIndex].linearVelocity = weaponStat.muzzle.forward
-        * weaponStat.GetStatByID<float>((int)FeatureType.fireStrength);
+        * _dispatcher.GetAllFeatureByType<float>(FeatureType.fireStrength).Sum();
 
         shootingIndex++;
 
         // Se non è automatico, disattiviamo il flag di shooting
-        if (!weaponStat.GetStatByID<bool>((int)FeatureType.automatic))
+        if (!_dispatcher.GetAllFeatureByType<bool>(FeatureType.automatic).Last())
             shooting = false;
     }
 
@@ -103,7 +106,7 @@ public class FireWeaponBehaviour : AbstractWeaponLogic
 
     public override void Reload()
     {
-        if (weaponStat.GetStatByID<int>((int)FeatureType.magCount) > 0)
+        if (magCount > 0)
         {
             if (animatorSet)
             {
@@ -111,12 +114,12 @@ public class FireWeaponBehaviour : AbstractWeaponLogic
             }
 
             timer = 0;
-            weaponStat.SetStatByID((int)FeatureType.magCount,
-                weaponStat.GetStatByID<int>((int)FeatureType.magCount) - 1);
 
+            magCount--;
             shootingIndex = 0;
         }
     }
+
     void DrawLaser()
     {
         // Ottieni la posizione e la direzione del laser (dalla posizione del muzzle)
@@ -128,7 +131,7 @@ public class FireWeaponBehaviour : AbstractWeaponLogic
 
         RaycastHit hit;
         // Se il raggio colpisce qualcosa, usa la posizione di impatto, altrimenti usa la lunghezza massima
-        if (Physics.Raycast(ray, out hit, weaponStat.GetStatByID<float>((int)FeatureType.laserLength), weaponStat.laserMask))
+        if (Physics.Raycast(ray, out hit, _dispatcher.GetAllFeatureByType<float>(FeatureType.laserLength).Sum(), weaponStat.laserMask))
         {
             weaponStat.lineRenderer.SetPosition(0, origineLaser);         // Punto di partenza (muzzle)
             weaponStat.lineRenderer.SetPosition(1, hit.point);            // Punto di impatto
@@ -137,7 +140,7 @@ public class FireWeaponBehaviour : AbstractWeaponLogic
         {
             weaponStat.lineRenderer.SetPosition(0, origineLaser);         // Punto di partenza (muzzle)
             weaponStat.lineRenderer.SetPosition(1, origineLaser + direzioneLaser *
-             weaponStat.GetStatByID<float>((int)FeatureType.laserLength));// Lunghezza massima del laser
+             _dispatcher.GetAllFeatureByType<float>(FeatureType.laserLength).Sum());// Lunghezza massima del laser
         }
     }
 

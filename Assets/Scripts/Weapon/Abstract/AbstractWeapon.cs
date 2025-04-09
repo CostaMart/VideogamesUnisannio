@@ -2,6 +2,9 @@ using UnityEngine;
 
 public abstract class AbstractWeaponLogic : ScriptableObject
 {
+
+    protected EffectsDispatcher _dispatcher;
+    public EffectsDispatcher Dispatcher { set { _dispatcher = value; } }
     [SerializeField] public WeaponStats weaponStat;
 
     public abstract void Enable();

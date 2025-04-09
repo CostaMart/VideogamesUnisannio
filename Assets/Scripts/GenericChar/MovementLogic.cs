@@ -1,4 +1,5 @@
 
+using System.Linq;
 using System.Numerics;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -9,7 +10,6 @@ using Vector3 = UnityEngine.Vector3;
 
 public class MovementLogic : MonoBehaviour
 {
-
     private Animator anim;
     public CinemachineCamera camera;
     private int jumpsAvailable = 1;
@@ -20,7 +20,7 @@ public class MovementLogic : MonoBehaviour
     private Collider col;
 
     // movement event manager 
-    [SerializeField] private CharStats playerSettings;
+    [SerializeField] private EffectsDispatcher dispatcher;
     [SerializeField] private ControlEventManager controlEventManager;
     private Vector3 moveDirection = Vector3.zero;
 
@@ -33,9 +33,10 @@ public class MovementLogic : MonoBehaviour
         controlEventManager.AddListenerJump(Jump);
         controlEventManager.AddListenerAiming((value) => Aiming = value);
     }
+
     void Start()
     {
-        jumpsAvailable = playerSettings.GetStatByID<int>((int)FeatureType.maxJumps);
+        jumpsAvailable = dispatcher.GetAllFeatureByType<int>(FeatureType.maxJumps).Sum();
 
         col = GetComponent<Collider>();
         anim = GetComponent<Animator>();
@@ -46,7 +47,9 @@ public class MovementLogic : MonoBehaviour
 
 
     private void FixedUpdate()
+
     {
+        Debug.Log("health: " + dispatcher.GetAllFeatureByType<float>(FeatureType.health).Sum());
 
         Vector3 direction = Vector3.zero;
 
@@ -71,8 +74,7 @@ public class MovementLogic : MonoBehaviour
             Vector3 q = camera.transform.forward;
             q.y = 0;
             Quaternion n = Quaternion.LookRotation(q);
-            rb.MoveRotation(Quaternion.Slerp(transform.rotation, n, playerSettings.GetStatByID<float>((int)FeatureType.aimRotationSpeed)));
-
+            rb.MoveRotation(Quaternion.Slerp(transform.rotation, n, dispatcher.GetAllFeatureByType<float>(FeatureType.aimRotationSpeed).Sum()));
         }
 
         if (direction != Vector3.zero)
@@ -81,11 +83,10 @@ public class MovementLogic : MonoBehaviour
             {
                 // rotazione basata sulla direzione di movimento, se non si mira
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
-                rb.MoveRotation(Quaternion.Slerp(transform.rotation, targetRotation, playerSettings.GetStatByID<float>((int)FeatureType.rotationSpeed)));
+                rb.MoveRotation(Quaternion.Slerp(transform.rotation, targetRotation, dispatcher.GetAllFeatureByType<float>(FeatureType.rotationSpeed).Sum()));
             }
 
-
-            rb.MovePosition(transform.position + direction.normalized * playerSettings.GetStatByID<float>((int)FeatureType.speed) * Time.deltaTime);
+            rb.MovePosition(transform.position + direction.normalized * dispatcher.GetAllFeatureByType<float>(FeatureType.speed).Sum() * Time.deltaTime);
         }
     }
 
@@ -93,7 +94,7 @@ public class MovementLogic : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("terrain"))
-            jumpsAvailable = playerSettings.GetStatByID<int>((int)FeatureType.maxJumps);
+            jumpsAvailable = dispatcher.GetAllFeatureByType<int>(FeatureType.maxJumps).Sum();
     }
 
     public void Jump()
@@ -108,7 +109,7 @@ public class MovementLogic : MonoBehaviour
 
         rb.linearVelocity = new Vector3(
             rb.linearVelocity.x,
-            playerSettings.GetStatByID<float>((int)FeatureType.jumpSpeedy),
+            dispatcher.GetAllFeatureByType<float>(FeatureType.jumpSpeedy).Sum(),
             rb.linearVelocity.z);
         jumpsAvailable--;
     }
